@@ -10,6 +10,15 @@ pwmF = 500 #Hz
 phi = math.pi / 11
 pwm = [None] * 10
 
+in1 = 14
+gpio.setup(in1, gpio.IN, pull_up_down=gpio.PUD_DOWN)
+
+def call(pin):
+    phi *= -1
+
+gpio.add_event_detect(in1, gpio.RISING, callback = call, bouncetime = 100)
+
+
 for i in range(10):
     gpio.setup(pin[i], gpio.OUT)
     pwm[i] = gpio.PWM(pin[i], pwmF)
@@ -23,5 +32,6 @@ try:
 except KeyboardInterrupt:
     print("out")
 
-pwm.stop()
+for each in pwm:
+    each.stop()
 gpio.cleanup()
