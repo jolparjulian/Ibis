@@ -2,20 +2,24 @@ import time
 import math
 import RPi.GPIO as gpio
 
-pin = 4
+pin = (4, 17, 27, 22, 10, 9, 11, 5, 6, 13)
 gpio.setmode(gpio.BCM) 
-gpio.setup(pin, gpio.OUT)
-
 t = time.time()
 f = 0.2 #Hz
 pwmF = 500 #Hz
-pwm = gpio.PWM(pin, pwmF)
+phi = math.pi / 11
+pwm = [None] * 10
+
+for i in range(pin):
+    gpio.setup(pin[i], gpio.OUT)
+    pwm[i] = gpio.PWM(pin, pwmF)
 
 try:
     while True:
         t = time.time()
-        brightness = (math.sin(math.pi * 2 * f * t)) ** 2
-        pwm.start(brightness * 100)
+        for i in range(pin):
+            brightness = (math.sin(math.pi * 2 * f * t - i * phi)) ** 2
+            pwm[i].start(brightness * 100)
 except KeyboardInterrupt:
     print("out")
 
