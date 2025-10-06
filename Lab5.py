@@ -12,7 +12,7 @@ pwm = [None] * 10
 
 for i in range(10):
     gpio.setup(pin[i], gpio.OUT)
-    pwm[i] = gpio.PWM(pin, pwmF)
+    pwm[i] = gpio.PWM(pin[i], pwmF)
 
 try:
     while True:
