@@ -14,6 +14,7 @@ in1 = 14
 gpio.setup(in1, gpio.IN, pull_up_down=gpio.PUD_DOWN)
 
 def call(pin):
+    global phi
     phi *= -1
 
 gpio.add_event_detect(in1, gpio.RISING, callback = call, bouncetime = 100)
