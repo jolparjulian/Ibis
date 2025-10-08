@@ -20,7 +20,9 @@ class Bug:
         while True:
             self.__schwifty.shiftByte(1 << self.x)
             time.sleep(self.timestep)
+            print('a')
             if (not self.isWrapOn):
+                print('b')
                 if (x == 0):
                     x = 1
                 elif (x == 7):
@@ -28,6 +30,7 @@ class Bug:
                 else:
                     x += random.choice([-1, 1])
             else:
+                print('c')
                 x += random.choice([-1, 1])
                 if (x == -1):
                     x = 7
