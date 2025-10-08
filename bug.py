@@ -29,13 +29,14 @@ class Bug:
                     x = 6
                 else:
                     x += random.choice([-1, 1])
+                    print('c')
             else:
-                print('c')
                 x += random.choice([-1, 1])
                 if (x == -1):
                     x = 7
                 elif (x == 8):
-                    x = 0     
+                    x = 0    
+            print('d') 
             
     def stop(self):
         self.__schwifty.shiftByte(0)
