@@ -1,6 +1,7 @@
 from shifter import Shifter
 import random
 import time
+import RPi.GPIO as gpio
 random.seed()
 
 class Bug:
@@ -9,7 +10,15 @@ class Bug:
         self.x = x
         self.isWrapOn = isWrapOn
 
-    __schwifty = Shifter(23, 25, 24)
+    serialPin = 23
+    latchPin = 24
+    clockPin = 25
+
+    gpio.setmode(gpio.BCM)
+    gpio.setup(serialPin, gpio.OUT)
+    gpio.setup(latchPin, gpio.OUT, initial = 0)
+    gpio.setup(clockPin, gpio.OUT, initial = 0)
+    __schwifty = Shifter(serialPin, clockPin, latchPin)
 
     def start(self):
         while True:
