@@ -20,23 +20,19 @@ class Bug:
         while True:
             self.__schwifty.shiftByte(1 << self.x)
             time.sleep(self.timestep)
-            print('a')
             if (not self.isWrapOn):
-                print('b')
                 if (self.x == 0):
                     self.x = 1
                 elif (self.x == 7):
                     self.x = 6
                 else:
                     self.x += random.choice([-1, 1])
-                    print('c')
             else:
                 self.x += random.choice([-1, 1])
                 if (self.x == -1):
                     self.x = 7
                 elif (self.x == 8):
                     self.x = 0    
-            print('d') 
             
     def stop(self):
         self.__schwifty.shiftByte(0)
