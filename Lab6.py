@@ -15,7 +15,7 @@ gpio.setup(latchPin, gpio.OUT, initial = 0)
 gpio.setup(clockPin, gpio.OUT, initial = 0)
 
 try:
-    ant = Bug()
+    ant = Bug(0.05, 4, False)
     ant.start()
         
 except:
