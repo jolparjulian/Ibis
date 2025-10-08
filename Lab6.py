@@ -1,6 +1,8 @@
 import time
 import RPi.GPIO as gpio
 from shifter import Shifter
+import random
+random.seed()
 
 serialPin = 23
 latchPin = 24
@@ -14,9 +16,16 @@ gpio.setup(clockPin, gpio.OUT, initial = 0)
 schwifty = Shifter(serialPin, clockPin, latchPin)
 
 try:
+    x = random.randint(0, 7)
     while True:
-        for i in range(2 ** 8):
-            schwifty.shiftByte(i)
-            time.sleep(0.5)
+        schwifty.shiftByte(1 << x)
+        time.sleep(0.05)
+        if (x == 0):
+            x = 1
+        elif (x == 7):
+            x = 6
+        else:
+            x += random.choice([-1, 1])
+        
 except:
     gpio.cleanup()
