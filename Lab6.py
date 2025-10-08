@@ -28,16 +28,21 @@ try:
 except:
     gpio.cleanup()
 
-def switch1(pin):
+def switch1on(pin):
     global ant
     ant.start()
+def switch1off(pin):
+    global ant
+    ant.stop()
 def switch2(pin):
     global ant
     ant.isWrapOn = not ant.isWrapOn
 def switch3(pin):
+    global ant
     ant.timestep = ant.timestep / 3
 
-gpio.add_event_detect(s1Pin, gpio.RISING, callback = switch1, bouncetime = 100)
+gpio.add_event_detect(s1Pin, gpio.RISING, callback = switch1on, bouncetime = 100)
+gpio.add_event_detect(s1Pin, gpio.FALLING, callback = switch1off, bouncetime = 100)
 gpio.add_event_detect(s2Pin, gpio.RISING, callback = switch2, bouncetime = 100)
 gpio.add_event_detect(s3Pin, gpio.RISING, callback = switch3, bouncetime = 100)
 
