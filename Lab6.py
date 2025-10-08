@@ -40,3 +40,6 @@ def switch3(pin):
 gpio.add_event_detect(s1Pin, gpio.RISING, callback = switch1, bouncetime = 100)
 gpio.add_event_detect(s2Pin, gpio.RISING, callback = switch2, bouncetime = 100)
 gpio.add_event_detect(s3Pin, gpio.RISING, callback = switch3, bouncetime = 100)
+
+while True:
+    pass
