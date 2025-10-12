@@ -26,31 +26,19 @@ ant = Bug()
 ant.start()
 
 s1 = False
+s2 = False
 s3 = False
 def switch1(pin):
-    print('d')
-    global ant
     global s1
     s1 = not s1
-    if (not s1):
-        ant.stop()
-        print('a')
-    else:
-        ant.start()
-        print('b')
-    print('c')
+
 def switch2(pin):
-    print('e')
-    global ant
-    ant.isWrapOn = not ant.isWrapOn
+    global s2
+    s2 = not s2
+
 def switch3(pin):
-    global ant
     global s3
     s3 = not s3
-    if (not s3):
-        ant.timestep *= 3
-    else:
-        ant.timestep /= 3
 
 gpio.add_event_detect(s1Pin, gpio.BOTH, callback = switch1, bouncetime = 100)
 gpio.add_event_detect(s2Pin, gpio.RISING, callback = switch2, bouncetime = 100)
@@ -58,7 +46,20 @@ gpio.add_event_detect(s3Pin, gpio.BOTH, callback = switch3, bouncetime = 100)
 
 try:
     while True:
-        pass
+        if (s3):
+            ant.timestep /= 3
+        else:
+            ant.timestep *= 3
+
+        if (s2):
+            ant.isWrapOn = True
+        else:
+            ant.isWrapOn = False
+
+        if (s1):
+            ant.start()
+        else:
+            ant.stop()
         
 except:
     gpio.cleanup()
