@@ -34,4 +34,4 @@ class Bug:
         time.sleep(self.timestep)
             
     def stop(self):
-        self.__schwifty.shiftByte(0)
+        self.__schwifty.shiftByte(0b00000000)
