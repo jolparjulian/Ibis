@@ -40,6 +40,7 @@ def switch1(pin):
         print('b')
     print('c')
 def switch2(pin):
+    print('e')
     global ant
     ant.isWrapOn = not ant.isWrapOn
 def switch3(pin):
