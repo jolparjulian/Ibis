@@ -31,17 +31,14 @@ s3 = False
 def switch1(pin):
     global s1
     s1 = not s1
-    print('a')
 
 def switch2(pin):
     global s2
     s2 = not s2
-    print('b')
 
 def switch3(pin):
     global s3
     s3 = not s3
-    print('c')
 
 gpio.add_event_detect(s1Pin, gpio.BOTH, callback = switch1, bouncetime = 100)
 gpio.add_event_detect(s2Pin, gpio.RISING, callback = switch2, bouncetime = 100)
@@ -49,7 +46,6 @@ gpio.add_event_detect(s3Pin, gpio.BOTH, callback = switch3, bouncetime = 100)
 
 try:
     while True:
-        print('d')
         if (s3):
             ant.timestep /= 3
         else:
