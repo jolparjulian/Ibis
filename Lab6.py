@@ -22,29 +22,37 @@ gpio.setup(s1Pin, gpio.IN, pull_up_down=gpio.PUD_DOWN)
 gpio.setup(s2Pin, gpio.IN, pull_up_down=gpio.PUD_DOWN)
 gpio.setup(s3Pin, gpio.IN, pull_up_down=gpio.PUD_DOWN)
 
-try:
-    ant = Bug()
-        
-except:
-    gpio.cleanup()
+ant = Bug()
 
-def switch1on(pin):
+s1 = False
+s3 = False
+def switch1(pin):
     global ant
-    ant.start()
-def switch1off(pin):
-    global ant
-    ant.stop()
+    global s1
+    s1 = not s1
+    if (not s1):
+        ant.stop()
+    else:
+        ant.start()
 def switch2(pin):
     global ant
     ant.isWrapOn = not ant.isWrapOn
 def switch3(pin):
     global ant
-    ant.timestep = ant.timestep / 3
+    global s3
+    s3 = not s3
+    if (not s3):
+        ant.timestep *= 3
+    else:
+        ant.timestep /= 3
 
-gpio.add_event_detect(s1Pin, gpio.RISING, callback = switch1on, bouncetime = 100)
-gpio.add_event_detect(s1Pin, gpio.FALLING, callback = switch1off, bouncetime = 100)
+gpio.add_event_detect(s1Pin, gpio.BOTH, callback = switch1, bouncetime = 100)
 gpio.add_event_detect(s2Pin, gpio.RISING, callback = switch2, bouncetime = 100)
 gpio.add_event_detect(s3Pin, gpio.RISING, callback = switch3, bouncetime = 100)
 
-while True:
-    pass
+try:
+    while True:
+        pass
+        
+except:
+    gpio.cleanup()
