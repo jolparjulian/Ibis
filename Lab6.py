@@ -28,6 +28,7 @@ ant.start()
 s1 = False
 s3 = False
 def switch1(pin):
+    print('d')
     global ant
     global s1
     s1 = not s1
