@@ -23,7 +23,7 @@ gpio.setup(s2Pin, gpio.IN, pull_up_down=gpio.PUD_DOWN)
 gpio.setup(s3Pin, gpio.IN, pull_up_down=gpio.PUD_DOWN)
 
 ant = Bug()
-ant.start()
+ant.stop()
 
 s1 = False
 s2 = False
