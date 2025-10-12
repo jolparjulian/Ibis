@@ -45,22 +45,26 @@ gpio.add_event_detect(s1Pin, gpio.BOTH, callback = switch1, bouncetime = 100)
 gpio.add_event_detect(s2Pin, gpio.RISING, callback = switch2, bouncetime = 100)
 gpio.add_event_detect(s3Pin, gpio.BOTH, callback = switch3, bouncetime = 100)
 
+def run():
+    global ant
+    if (s3):
+        ant.timestep /= 3
+    else:
+        ant.timestep *= 3
+
+    if (s2):
+        ant.isWrapOn = True
+    else:
+        ant.isWrapOn = False
+
+    if (s1):
+        ant.start()
+    else:
+        ant.stop()
+
 try:
     while True:
-        if (s3):
-            ant.timestep /= 3
-        else:
-            ant.timestep *= 3
-
-        if (s2):
-            ant.isWrapOn = True
-        else:
-            ant.isWrapOn = False
-
-        if (s1):
-            ant.start()
-        else:
-            ant.stop()
+        run()
         
 except:
     gpio.cleanup()
