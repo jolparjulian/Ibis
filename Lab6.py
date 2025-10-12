@@ -22,7 +22,8 @@ gpio.setup(s1Pin, gpio.IN, pull_up_down=gpio.PUD_DOWN)
 gpio.setup(s2Pin, gpio.IN, pull_up_down=gpio.PUD_DOWN)
 gpio.setup(s3Pin, gpio.IN, pull_up_down=gpio.PUD_DOWN)
 
-ant = Bug()
+shift = Shifter(serialPin, clockPin, latchPin)
+ant = Bug(shift)
 ant.stop()
 
 s1 = False

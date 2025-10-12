@@ -5,19 +5,14 @@ import RPi.GPIO as gpio
 random.seed()
 
 class Bug:
-    def __init__(self, timestep = 0.1, x = 3, isWrapOn = False):
+    def __init__(self, __shift, timestep = 0.1, x = 3, isWrapOn = False):
         self.timestep = timestep
         self.x = x
         self.isWrapOn = isWrapOn
-
-    serialPin = 23
-    latchPin = 24
-    clockPin = 25
-
-    __schwifty = Shifter(serialPin, clockPin, latchPin)
+        self.__shift = __shift
 
     def start(self):
-        self.__schwifty.shiftByte(1 << self.x)
+        self.__shift.shiftByte(1 << self.x)
         if (not self.isWrapOn):
             if (self.x == 0):
                 self.x = 1
@@ -34,4 +29,4 @@ class Bug:
         time.sleep(self.timestep)
             
     def stop(self):
-        self.__schwifty.shiftByte(0b00000000)
+        self.__shift.shiftByte(0b00000000)
