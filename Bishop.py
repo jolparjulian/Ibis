@@ -1,6 +1,7 @@
 import time
 import RPi.GPIO as gpio
 from shifter import Shifter
+from bug import Bug
 import random
 random.seed()
 
@@ -14,18 +15,11 @@ gpio.setup(latchPin, gpio.OUT, initial = 0)
 gpio.setup(clockPin, gpio.OUT, initial = 0)
 
 schwifty = Shifter(serialPin, clockPin, latchPin)
+ant = Bug(schwifty)
 
 try:
-    x = random.randint(0, 7)
     while True:
-        schwifty.shiftByte(1 << x)
-        time.sleep(0.05)
-        if (x == 0):
-            x = 1
-        elif (x == 7):
-            x = 6
-        else:
-            x += random.choice([-1, 1])
+        ant.start()
         
 except:
     gpio.cleanup()

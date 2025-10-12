@@ -1,7 +1,5 @@
-from shifter import Shifter
 import random
 import time
-import RPi.GPIO as gpio
 random.seed()
 
 class Bug:
