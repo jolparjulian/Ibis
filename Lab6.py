@@ -33,8 +33,11 @@ def switch1(pin):
     s1 = not s1
     if (not s1):
         ant.stop()
+        print('a')
     else:
         ant.start()
+        print('b')
+    print('c')
 def switch2(pin):
     global ant
     ant.isWrapOn = not ant.isWrapOn
