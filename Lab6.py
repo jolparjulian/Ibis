@@ -23,6 +23,7 @@ gpio.setup(s2Pin, gpio.IN, pull_up_down=gpio.PUD_DOWN)
 gpio.setup(s3Pin, gpio.IN, pull_up_down=gpio.PUD_DOWN)
 
 ant = Bug()
+ant.start()
 
 s1 = False
 s3 = False
@@ -48,7 +49,7 @@ def switch3(pin):
 
 gpio.add_event_detect(s1Pin, gpio.BOTH, callback = switch1, bouncetime = 100)
 gpio.add_event_detect(s2Pin, gpio.RISING, callback = switch2, bouncetime = 100)
-gpio.add_event_detect(s3Pin, gpio.RISING, callback = switch3, bouncetime = 100)
+gpio.add_event_detect(s3Pin, gpio.BOTH, callback = switch3, bouncetime = 100)
 
 try:
     while True:
