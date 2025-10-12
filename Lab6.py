@@ -49,6 +49,7 @@ gpio.add_event_detect(s3Pin, gpio.BOTH, callback = switch3, bouncetime = 100)
 
 try:
     while True:
+        print('d')
         if (s3):
             ant.timestep /= 3
         else:
