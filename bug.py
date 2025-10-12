@@ -27,4 +27,4 @@ class Bug:
         time.sleep(self.timestep)
             
     def stop(self):
-        self.__shift.shiftByte(0b00000000)
+        self.__shift.shiftByte(0)
