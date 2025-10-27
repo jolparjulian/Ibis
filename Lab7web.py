@@ -28,15 +28,15 @@ def page():
             <p>Select LED:</p>
             <div>
                 <input type="radio" id="LED_1" name="LEDList" value="LED_1" checked />
-                <label for="LED 1">LED 1 (""" + brightnessArray[0] + """%)</label>
+                <label for="LED 1">LED 1 (""" + str(brightnessArray[0]) + """%)</label>
             </div>
             <div>
                 <input type="radio" id="LED_2" name="LEDList" value="LED_2" unchecked />
-                <label for="LED 2">LED 2(""" + brightnessArray[1] + """%)</label>
+                <label for="LED 2">LED 2(""" + str(brightnessArray[1]) + """%)</label>
             </div>
             <div>
                 <input type="radio" id="LED_3" name="LEDList" value="LED_3" unchecked />
-                <label for="LED 3">LED 3(""" + brightnessArray[2] + """%)</label>
+                <label for="LED 3">LED 3(""" + str(brightnessArray[2]) + """%)</label>
             </div>
         </div>
         <br>
