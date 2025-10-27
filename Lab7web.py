@@ -1,7 +1,17 @@
 import socket
 import RPi.GPIO as gpio
 import threading
-import time
+
+gpio.setmode(gpio.BCM) 
+pins = [17, 27, 22]
+pwm = [None] * 3
+brightnessArray = [0, 0, 0]
+
+for i in range(3):
+    gpio.setup(pins[i], gpio.OUT)
+    pwm[i] = gpio.PWM(pins[i], 500)
+    pwm[i].start(brightnessArray[i])
+
 
 def page():
     html = """
@@ -17,16 +27,16 @@ def page():
         <div>
             <p>Select LED:</p>
             <div>
-                <input type="radio" id="LED 1" name="LEDList" value="LED 1" checked />
-                <label for="LED 1">LED 1</label>
+                <input type="radio" id="LED_1" name="LEDList" value="LED_1" checked />
+                <label for="LED 1">LED 1 (""" + brightnessArray[0] + """%)</label>
             </div>
             <div>
-                <input type="radio" id="LED 2" name="LEDList" value="LED 2" unchecked />
-                <label for="LED 2">LED 2</label>
+                <input type="radio" id="LED_2" name="LEDList" value="LED_2" unchecked />
+                <label for="LED 2">LED 2(""" + brightnessArray[1] + """%)</label>
             </div>
             <div>
-                <input type="radio" id="LED 3" name="LEDList" value="LED 3" unchecked />
-                <label for="LED 3">LED 3</label>
+                <input type="radio" id="LED_3" name="LEDList" value="LED_3" unchecked />
+                <label for="LED 3">LED 3(""" + brightnessArray[2] + """%)</label>
             </div>
         </div>
         <br>
@@ -59,10 +69,14 @@ def serve_web_page():
         client_message = conn.recv(2048).decode('utf-8')
         print(f'Message from client:\n{client_message}')
         data_dict = parsePOSTdata(client_message)
-        if 'led_byte' in data_dict.keys():   # make sure data was posted
-            led_byte = data_dict["led_byte"]
-        else:   # web page loading for 1st time so start with 0 for the LED byte
-            led_byte = '0'
+       
+        if "LEDList" in data_dict.keys():
+            ledStr = data_dict["LEDList"]
+            ledIndex = int(ledStr[-1]) - 1
+            if "brightness" in data_dict.keys():
+                brightnessArray[ledIndex] = data_dict["brightness"]
+                pwm[ledIndex].start(brightnessArray[ledIndex])
+        
         conn.send(b'HTTP/1.1 200 OK\r\n')                  # status line
         conn.send(b'Content-Type: text/html\r\n')          # headers
         conn.send(b'Connection: close\r\n\r\n')   
@@ -76,9 +90,9 @@ s = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # pass IP addr & socket ty
 s.bind(('', 8080))     # bind to given port
 s.listen(3)          # up to 3 queued connections
 
-webpageTread = threading.Thread(target=serve_web_page)
-webpageTread.daemon = True
-webpageTread.start()
+webpageThread = threading.Thread(target=serve_web_page)
+webpageThread.daemon = True
+webpageThread.start()
 
 # Do whatever we want while the web server runs in a separate thread:
 try:
@@ -86,6 +100,6 @@ try:
         pass
 except:
     print('Joining webpageTread')
-    webpageTread.join()
+    webpageThread.join()
     print('Closing socket')
     s.close()
