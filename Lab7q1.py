@@ -75,7 +75,7 @@ def serve_web_page():
             ledIndex = int(ledStr[-1]) - 1
             if "brightness" in data_dict.keys():
                 brightnessArray[ledIndex] = data_dict["brightness"]
-                pwm[ledIndex].start(int(brightnessArray[ledIndex]))
+                pwm[ledIndex].ChangeDutyCycle(int(brightnessArray[ledIndex]))
         
         conn.send(b'HTTP/1.1 200 OK\r\n')                  # status line
         conn.send(b'Content-Type: text/html\r\n')          # headers
