@@ -74,8 +74,8 @@ def serve_web_page():
             ledStr = data_dict["LEDList"]
             ledIndex = int(ledStr[-1]) - 1
             if "brightness" in data_dict.keys():
-                brightnessArray[ledIndex] = data_dict["brightness"]
-                pwm[ledIndex].start(brightnessArray[ledIndex])
+                brightnessArray[int(ledIndex)] = data_dict["brightness"]
+                pwm[int(ledIndex)].start(brightnessArray[int(ledIndex)])
         
         conn.send(b'HTTP/1.1 200 OK\r\n')                  # status line
         conn.send(b'Content-Type: text/html\r\n')          # headers
