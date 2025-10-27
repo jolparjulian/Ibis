@@ -73,7 +73,7 @@ def serve_web_page():
 
 #devoe code
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # pass IP addr & socket type
-s.bind(('', 80))     # bind to given port
+s.bind(('', 8080))     # bind to given port
 s.listen(3)          # up to 3 queued connections
 
 webpageTread = threading.Thread(target=serve_web_page)
