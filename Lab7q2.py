@@ -121,9 +121,9 @@ def serve_web_page():
                 brightnessArray[ledIndex] = data_dict["brightness"]
                 pwm[ledIndex].start(int(brightnessArray[ledIndex]))
         
-        conn.send(b'HTTP/1.1 200 OK\r\n')                  # status line
-        conn.send(b'Content-Type: text/html\r\n')          # headers
-        conn.send(b'Connection: close\r\n\r\n')   
+        #conn.send(b'HTTP/1.1 200 OK\r\n')                  # status line
+        #conn.send(b'Content-Type: text/html\r\n')          # headers
+        #conn.send(b'Connection: close\r\n\r\n')   
         try:
             conn.sendall(page())                       # body
         finally:
