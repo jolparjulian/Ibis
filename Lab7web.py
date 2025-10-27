@@ -32,11 +32,11 @@ def page():
             </div>
             <div>
                 <input type="radio" id="LED_2" name="LEDList" value="LED_2" unchecked />
-                <label for="LED 2">LED 2(""" + str(brightnessArray[1]) + """%)</label>
+                <label for="LED 2">LED 2 (""" + str(brightnessArray[1]) + """%)</label>
             </div>
             <div>
                 <input type="radio" id="LED_3" name="LEDList" value="LED_3" unchecked />
-                <label for="LED 3">LED 3(""" + str(brightnessArray[2]) + """%)</label>
+                <label for="LED 3">LED 3 (""" + str(brightnessArray[2]) + """%)</label>
             </div>
         </div>
         <br>
@@ -72,10 +72,13 @@ def serve_web_page():
        
         if "LEDList" in data_dict.keys():
             ledStr = data_dict["LEDList"]
+            print("ledStr: " + str(ledStr))
             ledIndex = int(ledStr[-1]) - 1
+            print("ledIndex: " + str(ledIndex))
             if "brightness" in data_dict.keys():
-                brightnessArray[int(ledIndex)] = data_dict["brightness"]
-                pwm[int(ledIndex)].start(brightnessArray[int(ledIndex)])
+                brightnessArray[ledIndex] = data_dict["brightness"]
+                print("brightness: " + data_dict['brightness'])
+                pwm[ledIndex].start(brightnessArray[ledIndex])
         
         conn.send(b'HTTP/1.1 200 OK\r\n')                  # status line
         conn.send(b'Content-Type: text/html\r\n')          # headers
