@@ -75,7 +75,7 @@ class Stepper:
 
     # Move relative angle from current position:
     def rotate(self, delta):
-        time.sleep(0.1)
+        time.sleep(0.2)
         p = multiprocessing.Process(target=self.__rotate, args=(delta,))
         p.start()
 
