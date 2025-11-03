@@ -26,11 +26,11 @@ class Shifter:
     def shiftWord(self, dataword, num_bits):
         for i in range((num_bits+1) % 8):
             gpio.output(self.serialPin, 0)
-            self.ping(self.clockPin)
+            self.__ping(self.clockPin)
         for i in range(num_bits): 
             gpio.output(self.serialPin, dataword & (1<<i))
-            self.ping(self.clockPin)
-            self.ping(self.latchPin)
+            self.__ping(self.clockPin)
+            self.__ping(self.latchPin)
 
     def shiftByte(self, databyte):
         self.shiftWord(databyte, 8)
