@@ -11,7 +11,7 @@ gpio.setup(latchPin, gpio.OUT, initial = 0)
 gpio.setup(clockPin, gpio.OUT, initial = 0)
 
 sch = ShifterJules(serialPin, clockPin, latchPin)
-seq = [0b00010000,0b00100000,0b01000000,0b10000000]
+seq = [0b00010001,0b00100010,0b01000100,0b10001000]
 
 try:
     while True:
