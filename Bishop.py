@@ -1,6 +1,6 @@
 import time
 import RPi.GPIO as gpio
-from shifter import Shifter
+from shifterJules import ShifterJules
 
 serialPin = 16
 latchPin = 20
@@ -10,7 +10,7 @@ gpio.setup(serialPin, gpio.OUT)
 gpio.setup(latchPin, gpio.OUT, initial = 0)
 gpio.setup(clockPin, gpio.OUT, initial = 0)
 
-sch = Shifter(serialPin, clockPin, latchPin)
+sch = ShifterJules(serialPin, clockPin, latchPin)
 seq = [0b00010000,0b00100000,0b01000000,0b10000000]
 
 try:

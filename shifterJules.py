@@ -1,7 +1,7 @@
 import RPi.GPIO as gpio
 import time
 
-class Shifter:
+class ShifterJules:
     def __init__(self, serialPin, clockPin, latchPin):
         self.serialPin = serialPin
         self.clockPin = clockPin
