@@ -109,10 +109,13 @@ if __name__ == '__main__':
 
     # Move as desired, with eacg step occuring as soon as the previous 
     # step ends:
+    print("a")
     m1.rotate(-90)
     m1.rotate(45)
+    print("a.5")
     m1.rotate(-90)
     m1.rotate(45)
+    print("b")
 
     # If separate multiprocessing.lock objects are used, the second motor
     # will run in parallel with the first motor:
@@ -120,6 +123,7 @@ if __name__ == '__main__':
     m2.rotate(-45)
     m2.rotate(45)
     m2.rotate(-90)
+    print("end")
  
     # While the motors are running in their separate processes, the main
     # code can continue doing its thing: 
