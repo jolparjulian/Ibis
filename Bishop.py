@@ -1,25 +1,7 @@
 import time
 import RPi.GPIO as gpio
 from shifter import Shifter
-from bug import Bug
-import random
-random.seed()
 
-serialPin = 23
-latchPin = 24
-clockPin = 25
+sch = Shifter(16, 20, 21)
+seq = [0b00010000,0b00110000,0b00100000,0b01100000,0b01000000,0b11000000,0b10000000,0b10010000]
 
-gpio.setmode(gpio.BCM)
-gpio.setup(serialPin, gpio.OUT)
-gpio.setup(latchPin, gpio.OUT, initial = 0)
-gpio.setup(clockPin, gpio.OUT, initial = 0)
-
-schwifty = Shifter(serialPin, clockPin, latchPin)
-ant = Bug(schwifty)
-
-try:
-    while True:
-        ant.start()
-        
-except:
-    gpio.cleanup()
