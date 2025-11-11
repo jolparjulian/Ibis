@@ -55,25 +55,25 @@ class Stepper:
 
     # Move a single +/-1 step in the motor sequence:
     def __step(self, dir):
-        self.step_state += dir    # increment/decrement the step
-        self.step_state %= 8      # ensure result stays in [0,7]
         #temp = Stepper.shifter_outputs.value 
         #temp &= ~(0b00001111<<self.shifter_bit_start)
         #temp |= Stepper.seq[self.step_state]<<self.shifter_bit_start
-        Stepper.shifter_outputs.value &= ~(0b00001111<<self.shifter_bit_start)
-        Stepper.shifter_outputs.value |= Stepper.seq[self.step_state]<<self.shifter_bit_start
         #print(f"motor {self.shifter_bit_start} state {self.step_state}")
         #print(f"motor {self.shifter_bit_start} shifting {bin(temp)}")
         #self.s.shiftByte(temp)
-        self.s.shiftByte(Stepper.shifter_outputs.value)
         #Stepper.shifter_outputs.value = temp
         with self.angle.get_lock():
+            self.step_state += dir    # increment/decrement the step
+            self.step_state %= 8      # ensure result stays in [0,7]
+            Stepper.shifter_outputs.value &= ~(0b00001111<<self.shifter_bit_start)
+            Stepper.shifter_outputs.value |= Stepper.seq[self.step_state]<<self.shifter_bit_start
+            self.s.shiftByte(Stepper.shifter_outputs.value)
             self.angle.value += dir/Stepper.steps_per_degree
             self.angle.value %= 360         # limit to [0,359.9+] range
 
     # Move relative angle from current position:
     def __rotate(self, delta):
-        self.lock.acquire()                 # wait until the lock is available
+        #self.lock.acquire()                 # wait until the lock is available
         numSteps = int(Stepper.steps_per_degree * abs(delta))    # find the right # of steps
         dir = self.__sgn(delta)        # find the direction (+/-1)
         #print(f"going {numSteps} in {dir} direction")
@@ -81,7 +81,7 @@ class Stepper:
             self.__step(dir)
             time.sleep(Stepper.delay/1e6)
         #print(f"i am at {self.angle.Value} angle yippee")
-        self.lock.release()
+        #self.lock.release()
 
     # Move relative angle from current position:
     def rotate(self, delta):
