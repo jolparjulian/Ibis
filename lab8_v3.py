@@ -130,7 +130,6 @@ if __name__ == '__main__':
 
     angle1 = multiprocessing.Value('f')
     angle2 = multiprocessing.Value('f')
-    Stepper.shifter_outputs = multiprocessing.Value('i')
 
     # Instantiate 2 Steppers:
     m1 = Stepper(s, lock1, angle1)
