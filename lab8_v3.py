@@ -68,19 +68,19 @@ class Stepper:
         self.s.shiftByte(Stepper.shifter_outputs)
         #Stepper.shifter_outputs.value = temp
         with self.angle.get_Lock():
-            self.angle.Value += dir/Stepper.steps_per_degree
-            self.angle.Value %= 360         # limit to [0,359.9+] range
+            self.angle.value += dir/Stepper.steps_per_degree
+            self.angle.value %= 360         # limit to [0,359.9+] range
 
     # Move relative angle from current position:
     def __rotate(self, delta):
         self.lock.acquire()                 # wait until the lock is available
         numSteps = int(Stepper.steps_per_degree * abs(delta))    # find the right # of steps
         dir = self.__sgn(delta)        # find the direction (+/-1)
-        print(f"going {numSteps} in {dir} direction")
-        for s in range(numSteps):      # take the steps
+        #print(f"going {numSteps} in {dir} direction")
+        for v in range(numSteps):      # take the steps
             self.__step(dir)
             time.sleep(Stepper.delay/1e6)
-        print(f"i am at {self.angle.Value} angle yippee")
+        #print(f"i am at {self.angle.Value} angle yippee")
         self.lock.release()
 
     # Move relative angle from current position:
@@ -91,13 +91,15 @@ class Stepper:
 
     # Move to an absolute angle taking the shortest possible path:
     def goToAngle(self, angle):
+        with self.angle.get_lock():
+            initialAngle = self.angle.value
         angle %= 360
-        self.delta = angle - self.angle.Value
+        self.delta = angle - initialAngle
         if self.delta > 180:
             self.delta -= 360
         elif self.delta < -180:
             self.delta += 360
-        print(f"i am going {self.delta} degrees from {self.angle.value} to {angle}")
+        #print(f"i am going {self.delta} degrees from {self.angle.value} to {angle}")
         self.rotate(self.delta)
 
     def pause(self, pauseTime):
@@ -112,7 +114,7 @@ class Stepper:
     # Set the motor zero point
     def zero(self):
         with self.angle.get_lock():
-            self.angle.Value = 0.0
+            self.angle.value = 0.0
 
 
 # Example use:
