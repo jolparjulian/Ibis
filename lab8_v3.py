@@ -139,33 +139,17 @@ if __name__ == '__main__':
     m1.zero()
     m2.zero()
 
-    # Move as desired, with eacg step occuring as soon as the previous 
-    # step ends:
-    #m1.rotate(-90)
-    #m1.rotate(45)
-    #m1.rotate(-90)
-    #m1.rotate(45)
+    m1.rotate(180)
+    m1.rotate(90)
+    m1.rotate(0)
+    m1.rotate(-90)
+
     # If separate multiprocessing.lock objects are used, the second motor
     # will run in parallel with the first motor:
-    #m2.rotate(180)
-    #m2.rotate(-45)
-    #m2.rotate(45)
-    #m2.rotate(-90)
-
-    m1.goToAngle(90)
-    #m1.pause(0.5)
-    m1.goToAngle(-45)
-    #m1.pause(0.5)
-
-    m2.goToAngle(-90)
-    #m2.pause(0.5)
-    m2.goToAngle(45)
-
-    m1.goToAngle(-135)
-    #m1.pause(0.5)
-    m1.goToAngle(135)
-    #m1.pause(0.5)
-    m1.goToAngle(0)
+    m2.rotate(-180)
+    m2.rotate(-90)
+    m2.rotate(0)
+    m2.rotate(90)
     # While the motors are running in their separate processes, the main
     # code can continue doing its thing: 
     try:
