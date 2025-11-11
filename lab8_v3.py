@@ -39,7 +39,7 @@ class Stepper:
     delay = 4000          # delay between motor steps [us]
     steps_per_degree = 4096/360    # 4096 steps/rev * 1/360 rev/deg
 
-    def __init__(self, shifter, lock, angle):
+    def __init__(self, shifter, lock):
         self.s = shifter           # shift register
         self.angle = multiprocessing.Value('d', 0.0)             # current output shaft angle
         self.step_state = 0        # track position in sequence
@@ -128,12 +128,9 @@ if __name__ == '__main__':
     lock1 = multiprocessing.Lock()
     lock2 = multiprocessing.Lock()
 
-    angle1 = multiprocessing.Value('f')
-    angle2 = multiprocessing.Value('f')
-
     # Instantiate 2 Steppers:
-    m1 = Stepper(s, lock1, angle1)
-    m2 = Stepper(s, lock2, angle2)
+    m1 = Stepper(s, lock1)
+    m2 = Stepper(s, lock2)
 
     # Zero the motors:
     m1.zero()
