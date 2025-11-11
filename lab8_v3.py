@@ -34,7 +34,7 @@ class Stepper:
 
     # Class attributes:
     num_steppers = 0      # track number of Steppers instantiated
-    shifter_outputs = 0   # track shift register outputs for all motors
+    shifter_outputs = multiprocessing.Value('i', 0)    # track shift register outputs for all motors
     seq = [0b0001,0b0011,0b0010,0b0110,0b0100,0b1100,0b1000,0b1001] # CCW sequence
     delay = 4000          # delay between motor steps [us]
     steps_per_degree = 4096/360    # 4096 steps/rev * 1/360 rev/deg
@@ -60,12 +60,12 @@ class Stepper:
         #temp = Stepper.shifter_outputs.value 
         #temp &= ~(0b00001111<<self.shifter_bit_start)
         #temp |= Stepper.seq[self.step_state]<<self.shifter_bit_start
-        Stepper.shifter_outputs &= ~(0b00001111<<self.shifter_bit_start)
-        Stepper.shifter_outputs |= Stepper.seq[self.step_state]<<self.shifter_bit_start
+        Stepper.shifter_outputs.value &= ~(0b00001111<<self.shifter_bit_start)
+        Stepper.shifter_outputs.value |= Stepper.seq[self.step_state]<<self.shifter_bit_start
         #print(f"motor {self.shifter_bit_start} state {self.step_state}")
         #print(f"motor {self.shifter_bit_start} shifting {bin(temp)}")
         #self.s.shiftByte(temp)
-        self.s.shiftByte(Stepper.shifter_outputs)
+        self.s.shiftByte(Stepper.shifter_outputs.value)
         #Stepper.shifter_outputs.value = temp
         with self.angle.get_lock():
             self.angle.value += dir/Stepper.steps_per_degree
@@ -130,7 +130,7 @@ if __name__ == '__main__':
 
     # Instantiate 2 Steppers:
     m1 = Stepper(s, lock1)
-    m2 = Stepper(s, lock2)
+    m2 = Stepper(s, lock1)
 
     # Zero the motors:
     m1.zero()
