@@ -92,7 +92,7 @@ class Stepper:
     # Move to an absolute angle taking the shortest possible path:
     def goToAngle(self, angle):
         angle %= 360
-        self.delta = angle-self.angle
+        self.delta = angle - self.angle.Value
         if self.delta > 180:
             self.delta -= 360
         elif self.delta < -180:
