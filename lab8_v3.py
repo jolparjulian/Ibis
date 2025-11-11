@@ -67,7 +67,7 @@ class Stepper:
         #self.s.shiftByte(temp)
         self.s.shiftByte(Stepper.shifter_outputs)
         #Stepper.shifter_outputs.value = temp
-        with self.angle.get_Lock():
+        with self.angle.get_lock():
             self.angle.value += dir/Stepper.steps_per_degree
             self.angle.value %= 360         # limit to [0,359.9+] range
 
