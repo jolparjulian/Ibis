@@ -39,9 +39,9 @@ class Stepper:
     delay = 2500          # delay between motor steps [us]
     steps_per_degree = 4096/360    # 4096 steps/rev * 1/360 rev/deg
     lock = multiprocessing.Lock()
+    s = Shifter(data=16,latch=20,clock=21)
 
     def __init__(self, shifter):
-        self.s = shifter           # shift register
         self.angle = multiprocessing.Value('d', 0.0)             # current output shaft angle
         self.step_state = 0        # track position in sequence
         self.shifter_bit_start = 4*Stepper.num_steppers  # starting bit position
@@ -55,23 +55,23 @@ class Stepper:
 
     # Move a single +/-1 step in the motor sequence:
     def __step(self, dir):
-        self.lock.acquire()
-        with self.angle.get_lock():
-            self.step_state += dir    # increment/decrement the step
-            self.step_state %= 8      # ensure result stays in [0,7]
+        self.step_state += dir    # increment/decrement the step
+        self.step_state %= 8      # ensure result stays in [0,7]
+        with Stepper.lock:
             Stepper.shifter_outputs.value &= ~(0b00001111<<self.shifter_bit_start)
             Stepper.shifter_outputs.value |= Stepper.seq[self.step_state]<<self.shifter_bit_start
-            self.s.shiftByte(Stepper.shifter_outputs.value)
+            Stepper.s.shiftByte(Stepper.shifter_outputs.value)
+
+        with self.angle.get_lock():            
             self.angle.value += dir/Stepper.steps_per_degree
             self.angle.value %= 360         # limit to [0,359.9+] range
-        self.lock.release()
 
     # Move relative angle from current position:
     def __rotate(self, delta):
         #self.lock.acquire()                 # wait until the lock is available
         numSteps = int(Stepper.steps_per_degree * abs(delta))    # find the right # of steps
         dir = self.__sgn(delta)        # find the direction (+/-1)
-        for v in range(numSteps):      # take the steps
+        for _ in range(numSteps):      # take the steps
             self.__step(dir)
             time.sleep(Stepper.delay/1e6)
         #self.lock.release()
@@ -113,7 +113,7 @@ class Stepper:
 
 if __name__ == '__main__':
 
-    s = Shifter(data=16,latch=20,clock=21)   # set up Shifter
+       # set up Shifter
 
     # Use multiprocessing.Lock() to prevent motors from trying to 
     # execute multiple operations at the same time:
