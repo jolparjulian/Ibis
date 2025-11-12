@@ -1,119 +1,117 @@
-# stepper_class_shiftregister_multiprocessing.py
-#
-# Stepper class
-#
-# Because only one motor action is allowed at a time, multithreading could be
-# used instead of multiprocessing. However, the GIL makes the motor process run 
-# too slowly on the Pi Zero, so multiprocessing is needed.
-
 import time
 import multiprocessing
-from shifter import Shifter   # your custom class
+from shifter import Shifter   # your custom shift register class
 
 class Stepper:
     """
-    Supports operation of an arbitrary number of stepper motors using
-    one or more shift registers.
+    Multiprocessing Stepper class with per-rotation processes.
+    Supports concurrent motion of multiple motors while maintaining
+    sequential order of rotations per motor.
     """
 
-    # Class attributes:
+    # Class attributes
     num_steppers = 0
-    seq = [0b0001, 0b0011, 0b0010, 0b0110,
-           0b0100, 0b1100, 0b1000, 0b1001]  # CCW sequence
-    delay = 2500             # delay between motor steps [us]
-    steps_per_degree = 4096 / 360  # 4096 steps/rev * 1/360 rev/deg
-    shifter_outputs = None   # will be a multiprocessing.Value('i', 0)
-    shared_lock = None       # single lock shared by all steppers
+    shifter_outputs = multiprocessing.Value('i', 0)
+    seq = [0b0001,0b0011,0b0010,0b0110,0b0100,0b1100,0b1000,0b1001]
+    delay = 2500  # [us]
+    steps_per_degree = 4096/360
+    lock = multiprocessing.Lock()
+    s = Shifter(data=16, latch=20, clock=21)
 
-    def __init__(self, shifter, angle):
-        self.s = shifter
+    def __init__(self):
         self.angle = multiprocessing.Value('d', 0.0)
         self.step_state = 0
         self.shifter_bit_start = 4 * Stepper.num_steppers
         Stepper.num_steppers += 1
 
-    # sign function
-    def __sgn(self, x):
-        return 0 if x == 0 else int(abs(x) / x)
+        # Queue of active processes for sequential rotations per motor
+        self._process_queue = []
 
-    # move one +/-1 step
+    # Signum function
+    def __sgn(self, x):
+        if x == 0: return 0
+        return int(abs(x)/x)
+
+    # Step motor by +1 or -1
     def __step(self, dir):
         self.step_state = (self.step_state + dir) % 8
-
-        with Stepper.shared_lock:
-            current = Stepper.shifter_outputs.value
-            mask = ~(0b00001111 << self.shifter_bit_start)
-            new = (current & mask) | (Stepper.seq[self.step_state] << self.shifter_bit_start)
-            Stepper.shifter_outputs.value = new
-            self.s.shiftByte(new)
+        with Stepper.lock:
+            Stepper.shifter_outputs.value &= ~(0b1111 << self.shifter_bit_start)
+            Stepper.shifter_outputs.value |= Stepper.seq[self.step_state] << self.shifter_bit_start
+            Stepper.s.shiftByte(Stepper.shifter_outputs.value)
 
         with self.angle.get_lock():
             self.angle.value = (self.angle.value + dir / Stepper.steps_per_degree) % 360
 
-    # rotate by a relative delta (blocking)
+    # Rotate relative angle (called in a separate process)
     def __rotate(self, delta):
-        numSteps = int(Stepper.steps_per_degree * abs(delta))
+        num_steps = int(abs(delta) * Stepper.steps_per_degree)
         dir = self.__sgn(delta)
-        for _ in range(numSteps):
+        for _ in range(num_steps):
             self.__step(dir)
-            time.sleep(Stepper.delay / 1e6)
+            time.sleep(max(Stepper.delay / 1e6, 0.01))  # Pi Zero timing safe
 
-    # public rotate (non-blocking, uses process)
+    # Public rotate method: spawns a new process for this rotation
     def rotate(self, delta):
+        if delta == 0:
+            return
+
         p = multiprocessing.Process(target=self.__rotate, args=(delta,))
         p.start()
+        self._process_queue.append(p)
 
-    # move to absolute angle via shortest path
+        # Clean up completed processes at the front of the queue
+        while self._process_queue and not self._process_queue[0].is_alive():
+            self._process_queue[0].join()
+            self._process_queue.pop(0)
+
+    # Move to absolute angle using shortest path
     def goToAngle(self, angle):
         with self.angle.get_lock():
-            initialAngle = self.angle.value
-        angle %= 360
-        delta = angle - initialAngle
+            current = self.angle.value
+
+        delta = (angle - current) % 360
         if delta > 180:
             delta -= 360
         elif delta < -180:
             delta += 360
-        self.rotate(delta)
 
-    def pause(self, pauseTime):
-        p = multiprocessing.Process(target=self.__pause, args=(pauseTime,))
+        if delta != 0:
+            self.rotate(delta)
+
+    # Pause (also spawns process if required)
+    def pause(self, pause_time):
+        def _pause(t):
+            time.sleep(t)
+
+        p = multiprocessing.Process(target=_pause, args=(pause_time,))
         p.start()
+        self._process_queue.append(p)
 
-    def __pause(self, pauseTime):
-        time.sleep(pauseTime)
+        # Clean up finished processes
+        while self._process_queue and not self._process_queue[0].is_alive():
+            self._process_queue[0].join()
+            self._process_queue.pop(0)
 
+    # Zero motor
     def zero(self):
         with self.angle.get_lock():
             self.angle.value = 0.0
 
-
-# Example usage:
+# Example usage
 if __name__ == '__main__':
-    s = Shifter(data=16, latch=20, clock=21)
-
-    # single shared lock for all motors
-    Stepper.shared_lock = multiprocessing.Lock()
-
-    # shared shift register state
-    Stepper.shifter_outputs = multiprocessing.Value('i', 0)
-
-    # create two steppers
-    m1 = Stepper(s, 0)
-    m2 = Stepper(s, 0)
+    m1 = Stepper()
+    m2 = Stepper()
 
     m1.zero()
     m2.zero()
 
-    # move the motors
+    # Concurrent rotations
     m1.goToAngle(90)
     m1.goToAngle(-45)
 
     m2.goToAngle(-90)
     m2.goToAngle(45)
-
-    m1.goToAngle(-135)
-    m1.goToAngle(135)
-    m1.goToAngle(0)
 
     try:
         while True:
