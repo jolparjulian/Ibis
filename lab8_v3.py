@@ -45,6 +45,7 @@ class Stepper:
         self.angle = multiprocessing.Value('d', 0.0)             # current output shaft angle
         self.step_state = 0        # track position in sequence
         self.shifter_bit_start = 4*Stepper.num_steppers  # starting bit position
+        self._active_process = None
 
         Stepper.num_steppers += 1   # increment the instance count
 
@@ -78,10 +79,12 @@ class Stepper:
 
     # Move relative angle from current position:
     def rotate(self, delta):
+        if self._active_process is not None:
+            self._active_process.join()
         time.sleep(0.1)
         p = multiprocessing.Process(target=self.__rotate, args=(delta,))
         p.start()
-        p.join()
+        self._active_process = p
 
     # Move to an absolute angle taking the shortest possible path:
     def goToAngle(self, angle):
