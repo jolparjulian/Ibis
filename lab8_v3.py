@@ -41,7 +41,7 @@ class Stepper:
     lock = multiprocessing.Lock()
     s = Shifter(data=16,latch=20,clock=21)
 
-    def __init__(self, shifter):
+    def __init__(self):
         self.angle = multiprocessing.Value('d', 0.0)             # current output shaft angle
         self.step_state = 0        # track position in sequence
         self.shifter_bit_start = 4*Stepper.num_steppers  # starting bit position
