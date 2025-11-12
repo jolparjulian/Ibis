@@ -119,8 +119,8 @@ if __name__ == '__main__':
     # execute multiple operations at the same time:
 
     # Instantiate 2 Steppers:
-    m1 = Stepper(s)
-    m2 = Stepper(s)
+    m1 = Stepper()
+    m2 = Stepper()
 
     # Zero the motors:
     m1.zero()
