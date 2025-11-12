@@ -2,6 +2,8 @@ import time
 import multiprocessing
 from shifter import Shifter   # your custom shift register class
 
+#Julian Cooper, Ben Greenberg, Stephen Snyder
+
 class Stepper:
     """
     Multiprocessing Stepper class with per-rotation processes.
