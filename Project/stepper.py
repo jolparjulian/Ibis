@@ -1,0 +1,85 @@
+import time
+import multiprocessing
+from shifter import Shifter
+
+class Stepper:
+    num_steppers = 0
+    shifter_outputs = multiprocessing.Value('i', 0)
+    seq = [0b0001,0b0011,0b0010,0b0110,0b0100,0b1100,0b1000,0b1001]
+    delay = 2500  # [us]
+    steps_per_degree = 4096/360
+    lock = multiprocessing.Lock()
+    s = Shifter(16, 21, 20)
+
+    def __init__(self):
+        self.angle = multiprocessing.Value('d', 0.0)
+        self.step_state = 0
+        self.shifter_bit_start = 4 * Stepper.num_steppers
+        Stepper.num_steppers += 1
+
+        self.queue = multiprocessing.Queue()
+        self.process = multiprocessing.Process(target=self._process_loop, args=(self.queue,))
+
+    def _process_loop(self, queue):
+        while True:
+            cmd, value = queue.get()
+
+            if cmd == "goTo":
+                self.__rotate(value)
+
+            elif cmd == "pause":
+                time.sleep(value)
+
+            elif cmd == "exit":
+                break
+
+    def start_process(self):
+        self.process.start()
+
+    def stop(self):
+        self.queue.put(("exit", None))
+        self.process.join()
+
+
+    # Signum function
+    def __sgn(self, x):
+        if x == 0: return 0
+        return int(abs(x)/x)
+
+    # Step motor by +1 or -1
+    def __step(self, dir):
+        self.step_state = (self.step_state + dir) % 8
+        with Stepper.lock:
+            Stepper.shifter_outputs.value &= ~(0b1111 << self.shifter_bit_start)
+            Stepper.shifter_outputs.value |= Stepper.seq[self.step_state] << self.shifter_bit_start
+            Stepper.s.shiftByte(Stepper.shifter_outputs.value)
+
+        with self.angle.get_lock():
+            self.angle.value = (self.angle.value + dir / Stepper.steps_per_degree) % 360
+    
+    # Rotate relative angle 
+    def __rotate(self, delta):
+        num_steps = int(abs(delta) * Stepper.steps_per_degree)
+        dir = self.__sgn(delta)
+        for _ in range(num_steps):
+            self.__step(dir)
+            time.sleep(Stepper.delay / 1e6)
+
+    # Move to absolute angle using shortest path
+    def goToAngle(self, angle):
+        with self.angle.get_lock():
+            current = self.angle.value
+
+        delta = (angle - current) % 360
+        if delta > 180:
+            delta -= 360
+        elif delta < -180:
+            delta += 360
+
+        if delta != 0:
+            self.queue.put(("goTo", delta))
+
+    # Zero motor
+    def zero(self):
+        with self.angle.get_lock():
+            self.angle.value = 0.0
