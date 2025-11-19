@@ -92,3 +92,26 @@ class Stepper:
     def zero(self):
         with self.angle.get_lock():
             self.angle.value = 0.0
+
+if __name__ == '__main__':
+    m1 = Stepper()
+    m2 = Stepper()
+
+    m1.zero()
+    m2.zero()
+
+    m1.start_process()
+    m2.start_process()
+
+    # Concurrent rotations
+    m1.goToAngle(90)
+    m1.goToAngle(-45)
+
+    m2.goToAngle(-90)
+    m2.goToAngle(45)
+
+    try:
+        while True:
+            time.sleep(0.1)
+    except KeyboardInterrupt:
+        print("\nend")

@@ -9,8 +9,8 @@ class Shifter():
         self.clockPin = clockPin
         
         GPIO.setup(self.serialPin, GPIO.OUT)
-        GPIO.setup(latchPin, GPIO.OUT, initial = 0)
-        GPIO.setup(clockPin, GPIO.OUT, initial = 0)
+        GPIO.setup(self.latchPin, GPIO.OUT, initial = 0)
+        GPIO.setup(self.clockPin, GPIO.OUT, initial = 0)
     
     def ping(self, p):
         GPIO.output(p,1)
