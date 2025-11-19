@@ -9,7 +9,7 @@ class Stepper:
     delay = 2500  # [us]
     steps_per_degree = 4096/360
     lock = multiprocessing.Lock()
-    s = Shifter(16, 21, 20)
+    s = Shifter(16, 20, 21)
 
     def __init__(self):
         self.angle = multiprocessing.Value('d', 0.0)

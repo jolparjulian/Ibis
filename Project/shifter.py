@@ -3,14 +3,14 @@ from time import sleep
 GPIO.setmode(GPIO.BCM)
 
 class Shifter():
-    def __init__(self, serialPin, clockPin, latchPin):
+    def __init__(self, serialPin, latchPin, clockPin):
         self.serialPin = serialPin
-        self.clockPin = clockPin
         self.latchPin = latchPin
+        self.clockPin = clockPin
         
         GPIO.setup(self.serialPin, GPIO.OUT)
-        GPIO.setup(self.clockPin, GPIO.OUT)
         GPIO.setup(self.latchPin, GPIO.OUT)
+        GPIO.setup(self.clockPin, GPIO.OUT)
     
     def ping(self, p):
         GPIO.output(p,1)
