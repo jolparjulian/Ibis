@@ -7,6 +7,10 @@ class Shifter():
         self.serialPin = serialPin
         self.clockPin = clockPin
         self.latchPin = latchPin
+        
+        GPIO.setup(self.serialPin, GPIO.OUT)
+        GPIO.setup(self.clockPin, GPIO.OUT)
+        GPIO.setup(self.latchPin, GPIO.OUT)
     
     def ping(self, p):
         GPIO.output(p,1)
