@@ -17,6 +17,7 @@ class Stepper:
         self.shifter_bit_start = 4 * Stepper.num_steppers
         Stepper.num_steppers += 1
 
+        self.busy = multiprocessing.Value('b', False)
         self.queue = multiprocessing.Queue()
         self.process = multiprocessing.Process(target=self._process_loop, args=(self.queue,))
 
@@ -25,10 +26,18 @@ class Stepper:
             cmd, value = queue.get()
 
             if cmd == "goTo":
+                with self.busy.get_lock():
+                    self.busy.value = True
                 self.__rotate(value)
+                with self.busy.get_lock():
+                    self.busy.value = False
 
             elif cmd == "pause":
+                with self.busy.get_lock():
+                    self.busy.value = True
                 time.sleep(value)
+                with self.busy.get_lock():
+                    self.busy.value = False
 
             elif cmd == "exit":
                 break
