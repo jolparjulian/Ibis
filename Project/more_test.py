@@ -1,7 +1,6 @@
-import time
 from stepper import Stepper
 
-motors = [Stepper() Stepper()]
+motors = [Stepper(), Stepper()]
 for m in enumerate(motors):
 	m.zero()
 	m.start_process()
