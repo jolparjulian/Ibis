@@ -1,11 +1,15 @@
 from stepper import Stepper
 
-motors = [Stepper(), Stepper()]
-for m in enumerate(motors):
-	m.zero()
-	m.start_process()
+m1 = Stepper()
+m2 = Stepper()
 
-motors[0].goToAngle(90)
-motors[1].goToAngle(90)
-motors[0].goToAngle(-90)
-motors[1].goToAngle(-90)
+m1.zero()
+m2.zero()
+
+m1.start_process()
+m2.start_process()
+
+m1.goToAngle(90)
+m2.goToAngle(90)
+m1.goToAngle(-90)
+m2.goToAngle(-90)
