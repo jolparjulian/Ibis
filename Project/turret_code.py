@@ -11,7 +11,6 @@ from stepper import Stepper #grab stepper class
 GPIO.setmode(GPIO.BCM)
 laser_pin = 17 #check this
 GPIO.setup(laser_pin, GPIO.OUT)
-laser_on = False
 laser_time = 2.5
 
 # Set up steppers
@@ -226,7 +225,7 @@ class LEDHandler(BaseHTTPRequestHandler):
 				destroy(positions)
 
 			if "ref" in data and "r" in data and "t" in data and "z" in data:
-				pos = [data["r"][0] data["t"][0] data["z"][0]]
+				pos = [float(data["r"][0]), float(data["t"][0]), float(data["z"][0])]
 				reference(pos[0],pos[1],pos[2]) # add as a reference
 
 
@@ -236,7 +235,6 @@ class LEDHandler(BaseHTTPRequestHandler):
 def jog(motor, amount): # bc the rotate function got removed
 	curr = motor.angle.value #current angle
 	motor.goToAngle(curr+amount)
-	return
 
 def reference(r, t, z): #run this when im hitting a known location
 	global ref_positions
@@ -265,28 +263,15 @@ def calibrate(): # run this after enough reference points
 	global cyl_position
 	# put in the cylinder coords for checks later
 	cyl_position[0] = np.sqrt(P[0]**2 + P[1]**2) # r
-	temp = 0
 	x = P[0]
 	y = P[1]
-	# quadrant shit
-	if P[0] <= 0:
-		x = abs(x)
-		temp = 90
-		if P[1] <= 0:
-			y = abs(y)
-			temp = 180
-		else:
-			temp = 90
-	else:
-		if P[1] <= 0:
-			y = abs(y)
-			temp = 270
-	cyl_position[1] = np.arctan(x/y)*360/(2*np.pi) + temp #degrees + quadrant
+	cyl_position[1] = np.arctan2(y,x) % 2*np.pi #radians, positive from 
 	cyl_position[2] = P[2]
 	return P
 
 def angles(pitch, yaw):
 	# makes 3d angle vector from pitch and yaw
+	# assumes degrees
 	pitch = pitch*2*np.pi/360
 	yaw = yaw*2*np.pi/360
 	return np.array([np.cos(pitch)*np.cos(yaw), np.cos(pitch)*np.sin(yaw), np.sin(yaw)])
@@ -294,24 +279,23 @@ def angles(pitch, yaw):
 def system_zero(): # zeros the motors, run when pointing at origin
 	vert.zero()
 	hor.zero()
-	return
 
 def aim_at(radius, angle, height):
-	global yaw, pitch
-	return
+	phi = cyl_position[2] - angle
+
 
 def destroy(json):
 	targets = []
 	# add targets from dicts
 	for tid, turret in json["turrets"].items():
 		r = turret["r"]
-		t = turret["theta"]
+		t = turret["t"]
 		z = assumed_height
-		if abs(theta-cyl_positions[1]) >= pos_tol: # make sure we dont try to kill ourselves
+		if abs(theta-cyl_position[1]) >= pos_tol: # make sure we dont try to kill ourselves
 			targets.append([r, t, z]) # add to kill list
 	for globe in json["globes"].items():
 		r = gloeb["r"]
-		t = globe["theta"]
+		t = globe["t"]
 		z = globe["z"]
 		targets.append([r, t, z])
 	for target in targets:
@@ -333,8 +317,6 @@ def run_server():
 	finally:
 		server.shutdown()
 		server.server_close()
-		for p in pwms:
-			p.stop()
 		GPIO.cleanup()
 		print("Clean exit complete.")
 
