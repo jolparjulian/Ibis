@@ -1,5 +1,4 @@
 from RPi import GPIO
-from time import sleep
 GPIO.setmode(GPIO.BCM)
 
 class Shifter():
@@ -12,19 +11,12 @@ class Shifter():
         GPIO.setup(self.latchPin, GPIO.OUT, initial = 0)
         GPIO.setup(self.clockPin, GPIO.OUT, initial = 0)
     
-    def ping(self, p):
+    def __ping(self, p):
         GPIO.output(p,1)
-        sleep(0)
         GPIO.output(p,0)
-
-    def shiftWord(self, dataword, num_bits):
-        for i in range((num_bits+1) % 8):
-            GPIO.output(self.serialPin, 0)
-            self.ping(self.clockPin)
-        for i in range(num_bits):
-            GPIO.output(self.serialPin, dataword & (1<<i))
-            self.ping(self.clockPin)
-            self.ping(self.latchPin)
    
-    def shiftByte(self, databyte):
-        self.shiftWord(databyte, 8)
+    def shiftByte(self, b):
+        for i in range(8):
+            GPIO.output(self.serialPin, b & (1 << i))
+            self.__ping(self.clockPin)
+        self.__ping(self.latchPin)

@@ -16,6 +16,7 @@ class Stepper:
         self.step_state = 0
         self.shifter_bit_start = 4 * Stepper.num_steppers
         Stepper.num_steppers += 1
+        self.angleFlag = False
 
         self.busy = multiprocessing.Value('b', False)
         self.queue = multiprocessing.Queue()
@@ -28,7 +29,9 @@ class Stepper:
             if cmd == "goTo":
                 with self.busy.get_lock():
                     self.busy.value = True
+                self.angleFlag = False
                 self.__rotate(value)
+                self.angleFlag = True
                 with self.busy.get_lock():
                     self.busy.value = False
 
@@ -52,8 +55,7 @@ class Stepper:
 
     # Signum function
     def __sgn(self, x):
-        if x == 0: return 0
-        return int(abs(x)/x)
+        return 1 if x > 0 else -1 if x < 0 else 0
 
     # Step motor by +1 or -1
     def __step(self, dir):
