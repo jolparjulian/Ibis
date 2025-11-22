@@ -11,6 +11,7 @@ class StepperMotor:
         self.bit_start = bit_start  # Start bit in the shift register
         self.target_angle = None    # Desired angle
         self.busy = False           # Motor busy flag
+        self.at_target = True
 
 class StepperManager:
     # Shared hardware
@@ -72,8 +73,10 @@ class StepperManager:
                 if m.target_angle is None or abs(m.target_angle - m.angle) < 0.01:
                     m.busy = False
                     m.target_angle = None
+                    m.at_target = True
                     continue
 
+                m.at_target = False
                 any_busy = True
                 # Compute shortest path
                 delta = (m.target_angle - m.angle) % 360
