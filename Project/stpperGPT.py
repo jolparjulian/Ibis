@@ -4,9 +4,8 @@ import multiprocessing
 from shifter import Shifter
 
 class StepperMotor:
-    """Data container for a motor attached to the shared shifter"""
     def __init__(self, bit_start):
-        self.angle = 0.0           # Current absolute angle
+        self.angle = 0.0            # Current absolute angle
         self.step_state = 0         # Sequence position
         self.bit_start = bit_start  # Start bit in the shift register
         self.target_angle = None    # Desired angle
@@ -42,20 +41,17 @@ class StepperManager:
         self.process.join()
 
     def rotate_motor(self, motor, delta):
-        """Queue a rotation command"""
         self.queue.put(("rotate", motor, delta))
 
     def go_to_angle(self, motor, angle):
-        """Queue an absolute rotation"""
         self.queue.put(("goto", motor, angle % 360))
 
     def zero_motor(self, motor):
         motor.angle = 0.0
 
-    # --- Private worker ---
     def _worker(self):
         while True:
-            # Process any new commands
+            # Process new commands
             while not self.queue.empty():
                 cmd, motor, value = self.queue.get()
                 if cmd == "exit":

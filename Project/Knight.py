@@ -1,0 +1,28 @@
+import RPi.GPIO as gpio
+import time
+
+serialPin = 16
+latchPin = 20
+clockPin = 21
+
+seq = [0b00010001,0b00100010,0b01000100,0b10001000]
+
+def ping(pin, tim):
+    gpio.output(pin, 1)
+    time.sleep(tim)
+    gpio.output(pin, 0)
+
+def shiftByte(b):
+    for i in range(8):
+        gpio.output(serialPin, b & (1 << i))
+        ping(clockPin)
+    ping(latchPin)
+    
+gpio.setmode(gpio.BCM)
+
+gpio.setup(serialPin, gpio.OUT)
+gpio.setup(latchPin, gpio.OUT, initial = 0)
+gpio.setup(clockPin, gpio.OUT, initial = 0)
+
+ping(clockPin, 2)
+ping(latchPin, 2)
