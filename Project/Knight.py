@@ -24,6 +24,13 @@ gpio.setup(serialPin, gpio.OUT)
 gpio.setup(latchPin, gpio.OUT, initial = 0)
 gpio.setup(clockPin, gpio.OUT, initial = 0)
 
+shiftByte(0b00000000)
+time.sleep(1)
+print("yep")
+shiftByte(0b11111111)
+time.sleep(60)
+
+'''
 ping(clockPin, 3)
 time.sleep(2)
 ping(latchPin, 3)
@@ -33,3 +40,4 @@ time.sleep(2)
 shiftByte(0b11111111)
 time.sleep(2)
 shiftByte(0b00000000)
+'''
