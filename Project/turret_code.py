@@ -2,7 +2,8 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 import RPi.GPIO as GPIO
 from urllib.parse import parse_qs
 import json
-import threading
+import requests
+import threadin
 import numpy as np
 import time
 from stepper import Stepper #grab stepper class
@@ -121,7 +122,7 @@ def make_page():
 
         <!-- JSON fetch -->
         <div class="row">
-            <button class="btn" onclick="fetchJSON()">load positions.json</button>
+            <button class="btn" onclick="send('json')">get them jsons</button>
         </div>
 
 
@@ -136,7 +137,7 @@ def make_page():
 
     <div class="box" style="width:300px; height:300px;">
         <div style="text-align:center; margin-top:50px;">
-            <button class="huge-button" style="padding:20px 40px;" onclick="fireLaser">fire the laser</button>
+            <button class="huge-button" style="padding:20px 40px;" onclick="fireLaser()">fire the laser</button>
         </div>
     </div>
 </div>
@@ -165,7 +166,7 @@ def make_page():
 		}});
 	}}
 
-	function fireLaser{{
+	function fireLaser(){{
 		//let gif = document.getElementById("laserGif");
 
     	// Reset GIF by changing the src
@@ -178,19 +179,6 @@ def make_page():
 	    // actually fire the thing
 	    send('fire');
 	}}
-
-	function fetchJSON() {{
-	    fetch("http://192.168.1.254:8000/positions.json")
-	        .then(r => r.text())
-	        .then(txt => {{
-	            fetch("/", {{
-	                method: "POST",
-	                headers: {{ "Content-Type": "application/x-www-form-urlencoded" }},
-	                body: "fetchjson=1&data=" + encodeURIComponent(txt)
-	            }});
-	        }})
-	        .catch(err => alert("Failed to fetch JSON file"));
-	}}	
 	let jogInterval = null;
 	function startJog(direction) {{
 	    send(direction);                      // initial press
@@ -251,16 +239,17 @@ class WebHandler(BaseHTTPRequestHandler):
 				# then zero
 				elif cmd == "zero":
 					system_zero()
+				elif cmd == "json":
+					data = requests.get("http://192.168.1.254:8000/positions.json")
+					print(data.text)
+					data = data.json()
+					raw = data["data"][0]
 
-			if "fetchjson" in data and "data" in data:
-				# do json stuff
-				raw = data["data"][0]
-
-				positions = json.loads(raw)
-				if test_mode:
-					test_json(positions)
-				else:
-					destroy(positions)
+					positions = json.loads(raw)
+					if test_mode:
+						test_json(positions)
+					else:
+						destroy(positions)
 
 			if "ref" in data and "r" in data and "t" in data and "z" in data:
 				pos = [float(data["r"][0]), float(data["t"][0]), float(data["z"][0])]
