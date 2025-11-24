@@ -153,8 +153,8 @@ def make_page():
 
 </div>
 
-<!-- GIF element -->
-<img id="laserGif" src="laser.gif" />
+//<!-- GIF element -->
+//<img id="laserGif" src="laser.gif" />
 
 <script>
 	function send(cmd) {{
@@ -166,14 +166,14 @@ def make_page():
 	}}
 
 	function fireLaser{{
-		let gif = document.getElementById("laserGif");
+		//let gif = document.getElementById("laserGif");
 
     	// Reset GIF by changing the src
-	    gif.style.display = "block";
-	    gif.src = "laser.gif?cache=" + new Date().getTime();
+	    //gif.style.display = "block";
+	    //gif.src = "laser.gif?cache=" + new Date().getTime();
 
 	    // Hide it after it finishes (adjust time to GIF length)
-	    setTimeout(() => gif.style.display = "none", 1500);
+	    //setTimeout(() => gif.style.display = "none", 1500);
 
 	    // actually fire the thing
 	    send('fire');
