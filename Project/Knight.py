@@ -25,11 +25,18 @@ gpio.setup(latchPin, gpio.OUT, initial = 0)
 gpio.setup(clockPin, gpio.OUT, initial = 0)
 
 shiftByte(0b00000000)
+<<<<<<< HEAD
 time.sleep(5)
 print("yep")
 shiftByte(0b10100011)
 time.sleep(90)
 shiftByte(0b00000000)
+=======
+time.sleep(1)
+print("yep")
+shiftByte(0b11111111)
+time.sleep(60)
+>>>>>>> 38ef706859a0a8866a9685dc5954831a93582f03
 
 '''
 ping(clockPin, 3)
@@ -41,4 +48,8 @@ time.sleep(2)
 shiftByte(0b11111111)
 time.sleep(2)
 shiftByte(0b00000000)
+<<<<<<< HEAD
 '''
+=======
+'''
+>>>>>>> 38ef706859a0a8866a9685dc5954831a93582f03
