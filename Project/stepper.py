@@ -7,7 +7,7 @@ class Stepper:
     shifter_outputs = multiprocessing.Value('i', 0)
     seq = [0b1001,0b1000,0b1100,0b0100,0b0110,0b0010,0b0011,0b0001]
     delay = 2500  # [us]
-    steps_per_degree = 1024/360
+    steps_per_degree = 1024.0/360.0
     lock = multiprocessing.Lock()
     s = Shifter(16, 20, 21)
 
@@ -90,6 +90,10 @@ class Stepper:
         if delta != 0:
             self.queue.put(("goTo", delta))
 
+    def pause(self, delay):
+        if delay != 0:
+            self.queue.put(("pause", delay))
+
     # Zero motor
     def zero(self):
         with self.angle.get_lock():
@@ -110,6 +114,7 @@ if __name__ == '__main__':
     m1.goToAngle(-45)
 
     m2.goToAngle(-90)
+    m2.pause(4)
     m2.goToAngle(45)
 
     try:
