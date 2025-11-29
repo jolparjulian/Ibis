@@ -43,14 +43,11 @@ class Stepper:
                     self.busy.value = False
 
             elif cmd == "exit":
+                self.process.join()
                 break
 
     def start_process(self):
         self.process.start()
-
-    def stop(self):
-        self.queue.put(("exit", None))
-        self.process.join()
 
 
     # Signum function
@@ -93,6 +90,9 @@ class Stepper:
     def pause(self, delay):
         if delay != 0:
             self.queue.put(("pause", delay))
+    
+    def stop(self):
+        self.queue.put(("exit", None))
 
     # Zero motor
     def zero(self):
@@ -116,6 +116,7 @@ if __name__ == '__main__':
     m2.goToAngle(-90)
     m2.pause(4)
     m2.goToAngle(45)
+    m2.stop()
 
     try:
         while True:
