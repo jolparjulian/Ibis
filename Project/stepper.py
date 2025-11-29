@@ -5,9 +5,9 @@ from shifter import Shifter
 class Stepper:
     num_steppers = 0
     shifter_outputs = multiprocessing.Value('i', 0)
-    seq = [0b0001,0b0011,0b0010,0b0110,0b0100,0b1100,0b1000,0b1001]
+    seq = [0b1001,0b1000,0b1100,0b0100,0b0110,0b0010,0b0011,0b0001]
     delay = 2500  # [us]
-    steps_per_degree = 4096/360
+    steps_per_degree = 1024/360
     lock = multiprocessing.Lock()
     s = Shifter(16, 20, 21)
 
