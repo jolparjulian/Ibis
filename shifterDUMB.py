@@ -3,7 +3,7 @@ from RPi import GPIO
 from time import sleep
 GPIO.setmode(GPIO.BCM)
 
-class Shifter():
+class ShifterDUMB():
     def __init__(self, data, clock, latch):
         self.dataPin = data
         self.latchPin = latch
