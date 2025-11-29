@@ -43,7 +43,6 @@ class Stepper:
                     self.busy.value = False
 
             elif cmd == "exit":
-                self.process.join()
                 break
 
     def start_process(self):
@@ -93,6 +92,7 @@ class Stepper:
     
     def stop(self):
         self.queue.put(("exit", None))
+        self.process.join()
 
     # Zero motor
     def zero(self):
