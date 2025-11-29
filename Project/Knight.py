@@ -15,8 +15,8 @@ def ping(pin, tim):
 def shiftByte(b):
     for i in range(8):
         gpio.output(serialPin, b & (1 << i))
-        ping(clockPin)
-    ping(latchPin)
+        ping(clockPin, 0)
+    ping(latchPin, 0)
     
 gpio.setmode(gpio.BCM)
 
@@ -24,5 +24,21 @@ gpio.setup(serialPin, gpio.OUT)
 gpio.setup(latchPin, gpio.OUT, initial = 0)
 gpio.setup(clockPin, gpio.OUT, initial = 0)
 
-ping(clockPin, 2)
-ping(latchPin, 2)
+shiftByte(0b00000000)
+time.sleep(5)
+print("yep")
+shiftByte(0b10100011)
+time.sleep(90)
+shiftByte(0b00000000)
+
+'''
+ping(clockPin, 3)
+time.sleep(2)
+ping(latchPin, 3)
+time.sleep(2)
+shiftByte(0b00000000)
+time.sleep(2)
+shiftByte(0b11111111)
+time.sleep(2)
+shiftByte(0b00000000)
+'''
