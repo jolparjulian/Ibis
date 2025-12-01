@@ -3,7 +3,7 @@ import RPi.GPIO as GPIO
 from urllib.parse import parse_qs
 import json
 import requests
-import threadin
+import threading
 import numpy as np
 import time
 from stepper import Stepper #grab stepper class
@@ -433,3 +433,4 @@ def run_server():
 
 if __name__ == "__main__":
 	run_server()
+
