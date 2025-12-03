@@ -423,30 +423,30 @@ def aim_at(radius, angle, height):
 	vert.goToAngle(yaw)
 
 def destroy(json):
-	targets = []
-	# add targets from dicts
-	for tid, turret in json.get("turrets",{}).items():
-		r = turret["r"]
-		t = turret["theta"]
-		z = assumed_height
-		'''
-		if abs(t-cyl_position[1]) >= pos_tol: # make sure we dont try to kill ourselves
-			targets.append([r, t, z]) # add to kill list
-		'''
-		if int(tid) != us_turret_num: # this should work better
-			targets.append([r, t, z]) # keeeeel
-	for globe in json.get("globes",[]):
-		r = globe["r"]
-		t = globe["theta"]
-		z = globe["z"]
-		targets.append([r, t, z])
-	for target in targets:
-		aim_at(target[0], target[1], target[2])
-		print(f"shooting at {target}")
-		while(not (hor.at_target and vert.at_target)):
-			# this blocks until the goToAngle commands are both done
-			pass
-		fire_laser()
+    targets = []
+    # add targets from dicts
+    for tid, turret in json.get("turrets",{}).items():
+        r = turret["r"]
+        t = turret["theta"]
+        z = assumed_height
+        '''
+        if abs(t-cyl_position[1]) >= pos_tol: # make sure we dont try to kill ourselves
+            targets.append([r, t, z]) # add to kill list
+        '''
+        if int(tid) != us_turret_num: # this should work better
+            targets.append([r, t, z]) # keeeeel
+    for globe in json.get("globes",[]):
+        r = globe["r"]
+        t = globe["theta"]
+        z = globe["z"]
+        targets.append([r, t, z])
+    for target in targets:
+        aim_at(target[0], target[1], target[2])
+        print(f"shooting at {target}")
+        while(not (hor.at_target and vert.at_target)):
+            # this blocks until the goToAngle commands are both done
+            pass
+        fire_laser()
 
 def test_motors():
 	# test code to check if the motors work
@@ -470,29 +470,30 @@ def test_motors():
 	print(f"vert at {vert.angle.value}, hor at {hor.angle.value}")
 
 def test_json(json):
-	# test to make sure json can be read
-	# this just goes through the json and prints out all the positions
+    # test to make sure json can be read
+    # this just goes through the json and prints out all the positions
 
-	# remember to put back the destroy function once tests are done
-	targets = []
-	# add targets from dicts
-	for tid, turret in json.get("turrets",{}).items():
-		r = turret["r"]
-		t = turret["theta"]
-		z = assumed_height
-		'''
-		if abs(t-cyl_position[1]) >= pos_tol: # make sure we dont try to kill ourselves
-			targets.append([r, t, z]) # add to kill list
-		'''
-		if int(tid) != us_turret_num:
-			targets.append([r, t, z]) # keeeeel
-		print(f"TURRET {tid} r: {targets[0]}, theta: {targets[1]}, z: {targets[2]}")
-	for globe in json.get("globes",[]):
-		r = globe["r"]
-		t = globe["theta"]
-		z = globe["z"]
-		targets.append([r, t, z])
-		print(f"GLOBE r: {targets[0]}, theta: {targets[1]}, z: {targets[2]}")
+    # remember to put back the destroy function once tests are done
+    targets = []
+    # add targets from dicts
+    for tid, turret in json.get("turrets",{}).items():
+        r = turret["r"]
+        t = turret["theta"]
+        z = assumed_height
+        '''
+        if abs(t-cyl_position[1]) >= pos_tol: # make sure we dont try to kill ourselves
+            targets.append([r, t, z]) # add to kill list
+        '''
+        if int(tid) != us_turret_num:
+            targets.append([r, t, z]) # keeeeel
+        if targets != []:
+            print(f"TURRET {tid} r: {targets[-1][0]}, theta: {targets[-1][1]}, z: {targets[-1][2]}")
+    for globe in json.get("globes",[]):
+        r = globe["r"]
+        t = globe["theta"]
+        z = globe["z"]
+        targets.append([r, t, z])
+        print(f"GLOBE r: {targets[-1][0]}, theta: {targets[-1][1]}, z: {targets[-1][2]}")
 
 def find_position(json):
     stuff = json.get("turrets",{}).items()
