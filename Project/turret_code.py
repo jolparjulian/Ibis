@@ -33,6 +33,7 @@ angle = [0,0] #pitch/yaw
 json_data = [] # to put json in later
 
 ip_string = "192.168.1.254" # defaults to his 
+ip_string = "172.20.10.4" # mine
 
 # some random stuff
 pos_tol = 3 * np.pi/180 # angular tolerance between us and the next turret over
@@ -343,7 +344,7 @@ class WebHandler(BaseHTTPRequestHandler):
 def jog(motor, amount): # bc the rotate function got removed
 	curr = motor.angle.value #current angle
 	motor.goToAngle(curr+amount)
-	print(f"{motor} going to {curr+amount}")
+	#print(f"{motor} going to {curr+amount}")
 
 def reference(r, t, z): #run this when im hitting a known location
 	global ref_positions
