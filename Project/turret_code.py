@@ -263,6 +263,7 @@ def make_page():
 # --- Request Handler ---
 class WebHandler(BaseHTTPRequestHandler):
     def do_GET(self):
+    	'''
         if self.path != "/" and os.path.isfile(self.path.lstrip("/")):
             filepath = self.path.lstrip("/")
             mime = mimetypes.guess_type(filepath)[0] or "application/octet-stream"
@@ -274,6 +275,7 @@ class WebHandler(BaseHTTPRequestHandler):
             with open(filepath, "rb") as f:
                 self.wfile.write(f.read())
             return
+        '''
         self.send_response(200)
         self.send_header("Content-type", "text/html")
         self.end_headers()
