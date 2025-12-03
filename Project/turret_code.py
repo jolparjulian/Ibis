@@ -494,6 +494,15 @@ def test_json(json):
 		targets.append([r, t, z])
 		print(f"GLOBE r: {targets[0]}, theta: {targets[1]}, z: {targets[2]}")
 
+def find_position(json):
+    stuff = json.get("turrets",{}).items()
+    for tid, turret in stuff:
+        if int(tid) == us_turret_num:
+            r = turret["r"]
+            t = turret["theta"]
+            us_pos = [r, t]
+            print(f"we live at r: {us_pos[0]}, theta: {us_pos[1]}")
+            break
 
 
 
