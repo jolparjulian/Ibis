@@ -10,7 +10,7 @@ from stepper import Stepper #grab stepper class
 
 #Set up GPIOs
 GPIO.setmode(GPIO.BCM)
-laser_pin = 17 #check this
+laser_pin = 26 #check this
 GPIO.setup(laser_pin, GPIO.OUT)
 laser_time = 2.5
 
@@ -30,12 +30,16 @@ cyl_position = [0,0,0] # r theta z
 ref_positions = [] # place r/t/z/stepper angles into here to math later
 angle = [0,0] #pitch/yaw
 
+json_data = [] # to put json in later
+
+ip_string = "192.168.1.254" # defaults to his 
+
 # some random stuff
 pos_tol = 3 * np.pi/180 # angular tolerance between us and the next turret over
 assumed_height = 0.2 # turret height for everyone else
 us_turret_num = 1 # our turret number, to find our position and also remove from json
 jog_amount = 1 #degrees to jog each arrow click
-test_mode = True
+test_mode = True # change this when i want to shoot everything
 
 # flow goes:
 # set up guy and point it at origin, somehow call system_zero
@@ -45,16 +49,12 @@ test_mode = True
 
 # --- HTML + JS ---
 def make_page():
-	return f"""
+    return f"""
 <!DOCTYPE html>
 <html>
 <head>
     <title>Control Panel</title>
     <style>
-    	#laserGif {{
-    		display:none;
-    		width:200px;
-		}}
         body {{
             font-family: Arial, sans-serif;
             margin: 40px;
@@ -95,6 +95,9 @@ def make_page():
             font-size: 48px; 
             padding: 30px 60px;
         }}
+        #afterJSON{{
+            display: none;
+        }}
     </style>
 </head>
 
@@ -122,7 +125,7 @@ def make_page():
 
         <!-- JSON fetch -->
         <div class="row">
-            <button class="btn" onclick="send('json')">get them jsons</button>
+            <button class="btn" onclick="jsonButton()">get them jsons</button>
         </div>
 
 
@@ -135,11 +138,32 @@ def make_page():
 
     </div>
 
-    <div class="box" style="width:300px; height:300px;">
-        <div style="text-align:center; margin-top:50px;">
-            <button class="huge-button" style="padding:20px 40px;" onclick="fireLaser()">fire the laser</button>
-        </div>
+    <div style="position:relative; text-align:center; margin-top:50px;">
+
+        <button id="laserBtn" class="huge-button" style="padding:20px 40px;" onclick="fireLaser()">
+            fire the laser
+        </button>
+
+        <!-- Overlay GIF -->
+        <video id="laserGif"
+            src=""
+            style="
+                position:absolute;
+                top:50%;
+                left:50%;
+                transform:translate(-50%, -50%);
+                width:400px;
+                display:none;
+                pointer-events:none;
+            muted
+            plays-inline
+            ">
     </div>
+    <div id="afterJSON" style="position:relative; text-align:center; margin-top:300px;">
+        <button class="btn" onclick="send('find')">play peekaboo</button>
+        <button class="btn" onclick="send('kill')">kill them all</button>
+    </div>
+
 </div>
 
 <!-- BOTTOM: r, theta, z reference -->
@@ -151,113 +175,167 @@ def make_page():
         <input id="zval" class="inputbox" placeholder="z">
         <button class="btn" onclick="reference()">reference</button>
     </div>
+    <div class="box">
+        <input id="rval2" class="inputbox" placeholder="r">
+        <input id="tval2" class="inputbox" placeholder="theta">
+        <input id="zval2" class="inputbox" placeholder="z">
+        <button class="btn" onclick="sendTo()">go here</button>
+    </div>
 
 </div>
-
-//<!-- GIF element -->
-//<img id="laserGif" src="laser.gif" />
+<audio id="laserSound" src="laser_sound.mp3"></audio>
 
 <script>
-	function send(cmd) {{
-		fetch("/", {{
-			method: "POST",
-			headers: {{ "Content-Type": "application/x-www-form-urlencoded" }},
-			body: "cmd=" + cmd
-		}});
-	}}
 
-	function fireLaser(){{
-		//let gif = document.getElementById("laserGif");
+    function send(cmd) {{
+        fetch("/", {{
+            method: "POST",
+            headers: {{ "Content-Type": "application/x-www-form-urlencoded" }},
+            body: "cmd=" + cmd
+        }});
+    }}
+    function jsonButton(){{
+        send('json');
+        document.getElementById("afterJSON").style.display = 'block'; //show stuff
+    }}
+    function fireLaser(){{
+        const gif = document.getElementById("laserGif");
+        const audio = document.getElementById("laserSound");
 
-    	// Reset GIF by changing the src
-	    //gif.style.display = "block";
-	    //gif.src = "laser.gif?cache=" + new Date().getTime();
+        gif.style.display = "block";
 
-	    // Hide it after it finishes (adjust time to GIF length)
-	    //setTimeout(() => gif.style.display = "none", 1500);
+        const src = "laser_gif.mp4";
+        gif.src = src;
+        gif.currentTime = 0;
+        gif.play();
 
-	    // actually fire the thing
-	    send('fire');
-	}}
-	let jogInterval = null;
-	function startJog(direction) {{
-	    send(direction);                      // initial press
-	    jogInterval = setInterval(()=> send(direction), 150); // repeat every 150ms
-	}}
-	function stopJog() {{
-	    if (jogInterval) {{ clearInterval(jogInterval); jogInterval = null; }}
-	}}
+        audio.currentTime = 0;
+        audio.play();
 
-	function reference() {{
-		let r = document.getElementById("rval").value;
-		let t = document.getElementById("tval").value;
-		let z = document.getElementById("zval").value;
+        gif.onended = () => {{
+            gif.style.display = "none";
+        }};
 
-		fetch("/", {{
-			method: "POST",
-			headers: {{ "Content-Type": "application/x-www-form-urlencoded" }},
-			body: "ref=1&r=" + r + "&t=" + t + "&z=" + z
-		}});
-	}}
+
+        send('fire'); // trigger server action
+    }}   
+    let jogInterval = null;
+    function startJog(direction) {{
+        send(direction);                      // initial press
+        jogInterval = setInterval(()=> send(direction), 150); // repeat every 150ms
+    }}
+    function stopJog() {{
+        if (jogInterval) {{ clearInterval(jogInterval); jogInterval = null; }}
+    }}
+
+    function reference() {{
+        let r = document.getElementById("rval").value;
+        let t = document.getElementById("tval").value;
+        let z = document.getElementById("zval").value;
+
+        fetch("/", {{
+            method: "POST",
+            headers: {{ "Content-Type": "application/x-www-form-urlencoded" }},
+            body: "ref=1&r=" + r + "&t=" + t + "&z=" + z
+        }});
+    }}
+
+    function sendTo() {{
+        let r = document.getElementById("rval2").value;
+        let t = document.getElementById("tval2").value;
+        let z = document.getElementById("zval2").value;
+
+        fetch("/", {{
+            method: "POST",
+            headers: {{ "Content-Type": "application/x-www-form-urlencoded" }},
+            body: "goTo=1&r=" + r + "&t=" + t + "&z=" + z
+        }});
+    }}
 </script>
 
 </body>
 </html>
 """
-
 # --- Request Handler ---
 class WebHandler(BaseHTTPRequestHandler):
-	def do_GET(self):
-		self.send_response(200)
-		self.send_header("Content-type", "text/html")
-		self.end_headers()
-		self.wfile.write(make_page().encode())
+    def do_GET(self):
+        if self.path != "/" and os.path.isfile(self.path.lstrip("/")):
+            filepath = self.path.lstrip("/")
+            mime = mimetypes.guess_type(filepath)[0] or "application/octet-stream"
 
-	def do_POST(self):
-		length = int(self.headers['Content-Length'])
-		body = self.rfile.read(length).decode()
-		data = parse_qs(body)
+            self.send_response(200)
+            self.send_header("Content-type", mime)
+            self.end_headers()
 
-		try:
-			if "cmd" in data:
-				cmd = data["cmd"][0]
-				# first four are motor jog u/d/l/r
-				if cmd == "up":
-					jog(vert, jog_amount)
-				elif cmd == "down":
-					jog(vert, -jog_amount)
-				elif cmd == "right":
-					jog(hor, -jog_amount)
-				elif cmd == "left":
-					jog(hor, jog_amount)
-				# then fire
-				elif cmd == "fire":
-					# thread it rah
-					laser = threading.Thread(target=fire_laser)
-					laser.daemon = True
-					laser.start()
-				# then zero
-				elif cmd == "zero":
-					system_zero()
-				elif cmd == "json":
-					data = requests.get("http://192.168.1.254:8000/positions.json")
-					print(data.text)
-					data = data.json()
-					raw = data["data"][0]
-
-					positions = json.loads(raw)
-					if test_mode:
-						test_json(positions)
-					else:
-						destroy(positions)
-
-			if "ref" in data and "r" in data and "t" in data and "z" in data:
-				pos = [float(data["r"][0]), float(data["t"][0]), float(data["z"][0])]
-				reference(pos[0],pos[1],pos[2]) # add as a reference
+            with open(filepath, "rb") as f:
+                self.wfile.write(f.read())
+            return
+        self.send_response(200)
+        self.send_header("Content-type", "text/html")
+        self.end_headers()
+        self.wfile.write(make_page().encode())
 
 
-		except:
-			pass
+    def do_POST(self):
+        length = int(self.headers['Content-Length'])
+        body = self.rfile.read(length).decode()
+        data = parse_qs(body)
+        global json_data
+
+        try:
+            if "cmd" in data:
+                cmd = data["cmd"][0]
+                print(cmd)
+                # first four are motor jog u/d/l/r
+                if cmd == "up":
+                    jog(vert, jog_amount)
+                elif cmd == "down":
+                    jog(vert, -jog_amount)
+                elif cmd == "right":
+                    jog(hor, -jog_amount)
+                elif cmd == "left":
+                    jog(hor, jog_amount)
+                # then fire
+                elif cmd == "fire":
+                    # thread it rah
+                    laser = threading.Thread(target=fire_laser)
+                    laser.daemon = True
+                    laser.start()
+                # then zero
+                elif cmd == "zero":
+                    system_zero()
+                elif cmd == "json":
+                    #data = requests.get("http://192.168.1.254:8000/positions.json")
+                    # will prompt for ip address
+                    json_data = requests.get(f"http://{ip_string}:8000/data_test.json")
+                    json_data = json_data.json()
+                    if json_data == None:
+                    	print("ya fucked up the ip address")
+                    #raw = data["data"][0]
+                    print(json_data)
+                    #raw = data[0]
+                    #print(raw)
+                    #global positions
+                    #positions = json.loads(raw)
+                    #print(positions)
+                elif cmd == "find":
+                    # find position
+                    find_position(json_data)
+                elif cmd == "kill":
+                    if test_mode:
+                        #test_json(positions)
+                        test_json(json_data)
+                    else:
+                        destroy(json_data)
+                        #destroy(positions)
+
+            if "ref" in data and "r" in data and "t" in data and "z" in data:
+                pos = [float(data["r"][0]), float(data["t"][0]), float(data["z"][0])]
+                reference(pos[0],pos[1],pos[2]) # add as a reference
+
+
+        except:
+            pass
 
 def jog(motor, amount): # bc the rotate function got removed
 	curr = motor.angle.value #current angle
@@ -432,4 +510,10 @@ def run_server():
 		print("Clean exit complete.")
 
 if __name__ == "__main__":
+    print("enter the ip address the json is hosted at (xxx.xxx.x.xxx)")
+    print("or 'localhost' for same device")
+    print("or 'skip' for devoe's")
+    temp = input()
+    if temp != "skip":
+        ip_string = temp
 	run_server()
