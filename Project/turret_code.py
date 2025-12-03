@@ -339,6 +339,7 @@ class WebHandler(BaseHTTPRequestHandler):
 
             if "goTo" in data and "r" in data and "t" in data and "z" in data:
                 pos = [float(data["r"][0]), float(data["t"][0]), float(data["z"][0])]
+                print(pos)
                 hor.goToAngle(pos[0])
                 vert.goToAngle(pos[1])
                 #aim_at(pos[0],pos[1],pos[2]) # point at
