@@ -140,7 +140,7 @@ def make_page():
 
     <div style="position:relative; text-align:center; margin-top:50px;">
 
-        <button id="laserBtn" class="huge-button" style="padding:20px 40px;" onclick="fireLaser()">
+        <button id="laserBtn" class="huge-button" style="padding:20px 40px;" onclick="Laser()">
             fire the laser
         </button>
 
@@ -197,6 +197,9 @@ def make_page():
     function jsonButton(){{
         send('json');
         document.getElementById("afterJSON").style.display = 'block'; //show stuff
+    }}
+    function Laser(){{
+    	send('fire');
     }}
     function fireLaser(){{
         const gif = document.getElementById("laserGif");
