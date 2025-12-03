@@ -311,7 +311,7 @@ class WebHandler(BaseHTTPRequestHandler):
                 elif cmd == "json":
                     #data = requests.get("http://192.168.1.254:8000/positions.json")
                     # will prompt for ip address
-                    json_data = requests.get(f"http://{ip_string}:8000/data_test.json")
+                    json_data = requests.get(f"http://{ip_string}:8000/positions.json")
                     json_data = json_data.json()
                     if json_data == None:
                     	print("ya fucked up the ip address")
