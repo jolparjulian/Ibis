@@ -344,6 +344,11 @@ class WebHandler(BaseHTTPRequestHandler):
                 print(pos)
                 hor.goToAngle(pos[0])
                 vert.goToAngle(pos[1])
+                while(not (hor.at_target and vert.at_target)):
+            # this blocks until the goToAngle commands are both done
+                    pass
+                print(hor.angle.value)
+                print(vert.angle.value)
                 #aim_at(pos[0],pos[1],pos[2]) # point at
 
         except:
@@ -451,9 +456,6 @@ def destroy(json):
     for target in targets:
         aim_at(target[0], target[1], target[2])
         print(f"shooting at {target}")
-        while(not (hor.at_target and vert.at_target)):
-            # this blocks until the goToAngle commands are both done
-            pass
         fire_laser()
 
 def test_motors():
