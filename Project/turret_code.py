@@ -510,10 +510,4 @@ def run_server():
 		print("Clean exit complete.")
 
 if __name__ == "__main__":
-	print("enter the ip address the json is hosted at (xxx.xxx.x.xxx)")
-	print("or 'localhost' for same device")
-	print("or 'skip' for devoe's")
-		temp = input()
-	if temp != "skip":
-		ip_string = temp
 	run_server()
