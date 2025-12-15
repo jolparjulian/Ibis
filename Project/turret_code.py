@@ -455,6 +455,8 @@ class WebHandler(BaseHTTPRequestHandler):
                 aim_at(pos[0],pos[1],pos[2]) # point at
             if "motorAngles" in data and "pitch" in data and "yaw" in data:
                 print("turn damn it")
+                print(float(data["yaw"][0]))
+                print(float(data["pitch"][0]))
                 #straight motor angles
                 hor.goToAngle(float(data["yaw"][0]))
                 vert.goToAngle(float(data["pitch"][0]))
