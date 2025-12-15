@@ -7,16 +7,17 @@ class Stepper:
     shifter_outputs = multiprocessing.Value('i', 0)
     seq = [0b1001,0b1000,0b1100,0b0100,0b0110,0b0010,0b0011,0b0001]
     delay = 2500  # [us]
-    steps_per_degree = 1024.0/360.0
+    #steps_per_degree = 1024.0/360.0
     lock = multiprocessing.Lock()
     s = Shifter(16, 20, 21)
 
-    def __init__(self):
+    def __init__(self, steps_per_degree):
         self.angle = multiprocessing.Value('d', 0.0)
         self.step_state = 0
         self.shifter_bit_start = 4 * Stepper.num_steppers
         Stepper.num_steppers += 1
         self.angleFlag = False
+        self.steps_per_degree = steps_per_degree #required bc belt gearing
 
         self.busy = multiprocessing.Value('b', False)
         self.queue = multiprocessing.Queue()
@@ -34,7 +35,15 @@ class Stepper:
                 self.angleFlag = True
                 with self.busy.get_lock():
                     self.busy.value = False
-
+            elif cmd == "step":
+                with self.busy.get_lock():
+                    self.busy.value = True
+                self.angleFlag = False
+                self.__step(value)
+                time.sleep(Stepper.delay / 1e6)
+                self.angleFlag = True
+                with self.busy.get_lock():
+                    self.busy.value = False
             elif cmd == "pause":
                 with self.busy.get_lock():
                     self.busy.value = True
@@ -76,15 +85,29 @@ class Stepper:
     def goToAngle(self, angle):
         with self.angle.get_lock():
             current = self.angle.value
-
+            '''
         delta = (angle - current) % 360
         if delta > 180:
             delta -= 360
         elif delta < -180:
             delta += 360
+            '''
+        # normalize and shift the sign change
+        angle = angle%360 - 180
+        current = current%360 - 180
+        delta = angle-current
+        # if diff signs (opposite sides) go the other way
+        if (angle*current < 0):
+            delta += 360 if delta < 0 else -360
+
 
         if delta != 0:
             self.queue.put(("goTo", delta))
+
+    # go by step, for jog code
+    def goStep(self,direc):
+        direc = self.__sgn(direc) # normalizes to ensure one step
+        self.queue.put(("step",direc))
 
     def pause(self, delay):
         if delay != 0:
