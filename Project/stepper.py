@@ -61,7 +61,8 @@ class Stepper:
 
     # Signum function
     def __sgn(self, x):
-        return self.sign if x > 0 else -self.sign if x < 0 else 0
+        return 1 if x > 0 else -1 if x < 0 else 0
+        #return self.sign if x > 0 else -self.sign if x < 0 else 0
 
     # Step motor by +1 or -1
     def __step(self, dir):
