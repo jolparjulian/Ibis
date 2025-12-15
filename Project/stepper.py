@@ -11,13 +11,14 @@ class Stepper:
     lock = multiprocessing.Lock()
     s = Shifter(16, 20, 21)
 
-    def __init__(self, steps_per_degree):
+    def __init__(self, steps_per_degree, sign):
         self.angle = multiprocessing.Value('d', 0.0)
         self.step_state = 0
         self.shifter_bit_start = 4 * Stepper.num_steppers
         Stepper.num_steppers += 1
         self.angleFlag = False
         self.steps_per_degree = steps_per_degree #required bc belt gearing
+        self.sign = sign # required bc the motors arent oriented the same
 
         self.busy = multiprocessing.Value('b', False)
         self.queue = multiprocessing.Queue()
@@ -60,7 +61,7 @@ class Stepper:
 
     # Signum function
     def __sgn(self, x):
-        return -1 if x > 0 else 1 if x < 0 else 0
+        return self.sign if x > 0 else -self.sign if x < 0 else 0
 
     # Step motor by +1 or -1
     def __step(self, dir):
