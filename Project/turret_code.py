@@ -120,7 +120,7 @@ def make_page():
 
 <body>
 <header>
-    <h1> ONLY INPUT IN DEGREES </h1>
+    <h1> ONLY INPUT IN DEGREES AND MM </h1>
 </header>
 
 <div class="stuff">
@@ -456,8 +456,8 @@ class WebHandler(BaseHTTPRequestHandler):
             if "motorAngles" in data and "pitch" in data and "yaw" in data:
                 print("turn damn it")
                 #straight motor angles
-                hor.goToAngle(float(data["pitch"][0]))
-                vert.goToAngle(float(data["yaw"][0]))
+                hor.goToAngle(float(data["yaw"][0]))
+                vert.goToAngle(float(data["pitch"][0]))
             if "removeRef" in data:
                 idx = int(data["removeRef"][0])
                 if 0 <= idx < len(ref_positions):
