@@ -17,8 +17,8 @@ GPIO.setup(laser_pin, GPIO.OUT)
 laser_time = 2.5
 
 # Set up steppers, with steps/deg input
-vert = Stepper(1024/360,-1) # laser pitch
-hor = Stepper(1024*4/360,1) # plate yaw
+vert = Stepper(1024/360,1) # laser pitch
+hor = Stepper(1024*4/360,-1) # plate yaw
 
 vert.zero()
 hor.zero()
