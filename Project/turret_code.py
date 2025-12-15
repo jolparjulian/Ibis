@@ -406,13 +406,13 @@ class WebHandler(BaseHTTPRequestHandler):
                 print(cmd)
                 # first four are motor jog u/d/l/r
                 if cmd == "up":
-                    vert.goStep(1)
-                elif cmd == "down":
                     vert.goStep(-1)
+                elif cmd == "down":
+                    vert.goStep(1)
                 elif cmd == "right":
-                    hor.goStep(-1)
-                elif cmd == "left":
                     hor.goStep(1)
+                elif cmd == "left":
+                    hor.goStep(-1)
                 # then fire
                 elif cmd == "fire":
                     # thread it rah
