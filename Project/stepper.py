@@ -65,15 +65,16 @@ class Stepper:
         #return self.sign if x > 0 else -self.sign if x < 0 else 0
 
     # Step motor by +1 or -1
+    # CHANGED TO MAKE THE MOTORS GO BACKWARDS
     def __step(self, dir):
-        self.step_state = (self.step_state + dir) % 8
+        self.step_state = (self.step_state - dir) % 8
         with Stepper.lock:
             Stepper.shifter_outputs.value &= ~(0b1111 << self.shifter_bit_start)
             Stepper.shifter_outputs.value |= Stepper.seq[self.step_state] << self.shifter_bit_start
             Stepper.s.shiftByte(Stepper.shifter_outputs.value)
 
         with self.angle.get_lock():
-            self.angle.value = (self.angle.value - dir / self.steps_per_degree) % 360
+            self.angle.value = (self.angle.value + dir / self.steps_per_degree) % 360
     
     # Rotate relative angle 
     def __rotate(self, delta):
