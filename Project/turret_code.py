@@ -17,8 +17,8 @@ GPIO.setup(laser_pin, GPIO.OUT)
 laser_time = 2.5
 
 # Set up steppers, with steps/deg input
-vert = Stepper(1024/360,1) # laser pitch
-hor = Stepper(1024*4/360,-1) # plate yaw
+hor = Stepper(1024*4/360) # laser pitch
+vert = Stepper(1024/360) # plate yaw
 
 vert.zero()
 hor.zero()
@@ -27,10 +27,12 @@ vert.start_process()
 hor.start_process()
 
 # Positional variables
-cyl_position = [1828.8,np.radians(301),31] # xyz
-position = [0,0,0] # r theta z
+cyl_position = [1828.8,np.radians(301),31] # r t z
+position = [0,0,0] # disregard
 ref_positions = [] # place r/t/z/stepper angles into here to math later
 angle = [0,0] #pitch/yaw
+# replace the second number with our degrees position
+offset = 360-57 # so we can reference yaw angle to center
 
 json_data = [] # to put json in later
 
@@ -135,7 +137,7 @@ def make_page():
     
     <br><br>
     
-    <h4>Yaw / Pitch Input</h4>
+    <h4>Horizontal / Vertical Input</h4>
     
     <input class="inputBox" id="yawval" class="inputbox" placeholder="horizontal">
     <input class="inputBox" id="pitchval" class="inputbox" placeholder="vertical">
@@ -406,13 +408,13 @@ class WebHandler(BaseHTTPRequestHandler):
                 print(cmd)
                 # first four are motor jog u/d/l/r
                 if cmd == "up":
-                    vert.goStep(-1)
-                elif cmd == "down":
                     vert.goStep(1)
+                elif cmd == "down":
+                    vert.goStep(-1)
                 elif cmd == "right":
-                    hor.goStep(1)
-                elif cmd == "left":
                     hor.goStep(-1)
+                elif cmd == "left":
+                    hor.goStep(1)
                 # then fire
                 elif cmd == "fire":
                     # thread it rah
@@ -436,13 +438,11 @@ class WebHandler(BaseHTTPRequestHandler):
                 elif cmd == "find":
                     # find position
                     find_position(json_data)
-                elif cmd == "kill":
-                    if test_mode:
-                        #test_json(positions)
-                        test_json(json_data)
-                    else:
-                        destroy(json_data)
-                        #destroy(positions)
+                elif cmd == "test":
+                    test_json(json_data)
+                elif cmd == "destroy":
+                    destroy(json_data)
+                    #destroy(positions)
 
             if "ref" in data and "r" in data and "t" in data and "z" in data:
                 pos = [float(data["r"][0]), float(data["t"][0]), float(data["z"][0])]
@@ -529,17 +529,17 @@ def calibrate(): # run this after enough reference points
     y = P[1]
     cyl_position[1] = (np.arctan2(y,x) % (2*np.pi)).item() #radians, positive from 
     cyl_position[2] = P[2].item()
-    print(P)
+    print(cyl_position)
     return P
 
 def angles(pitch, yaw):
     # makes 3d angle vector from pitch and yaw
     # assumes degrees
     pitch = np.radians(pitch)
-    yaw = np.radians(yaw)
+    yaw = np.radians(yaw+offset)
     return np.array([np.cos(pitch)*np.cos(yaw),
                      np.cos(pitch)*np.sin(yaw), 
-                     np.sin(yaw)]).tolist()
+                     np.sin(pitch)]).tolist()
 
 def system_zero(): # zeros the motors, run when pointing at origin
     vert.zero()
@@ -580,9 +580,9 @@ def aim_at(radius, angle, height):
     pitch = np.arctan2(dz,np.sqrt(dx**2 + dy**2))*180/np.pi
 
     # go motors go
-    print(f"hor going to {pitch}, vert going to {yaw}")
-    hor.goToAngle(pitch)
-    vert.goToAngle(yaw)
+    print(f"hor going to {yaw}, vert going to {pitch}")
+    hor.goToAngle(yaw)
+    vert.goToAngle(pitch)
 
 def destroy(json):
     targets = []
