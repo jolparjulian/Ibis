@@ -12,7 +12,7 @@ from stepper import Stepper #grab stepper class
 
 #Set up GPIOs
 GPIO.setmode(GPIO.BCM)
-laser_pin = 26 #check this
+laser_pin = 17 #check this
 GPIO.setup(laser_pin, GPIO.OUT)
 laser_time = 2.5
 
@@ -687,3 +687,4 @@ def run_server():
 
 if __name__ == "__main__":
 	run_server()
+
