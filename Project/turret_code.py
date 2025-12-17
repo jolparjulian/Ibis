@@ -619,7 +619,8 @@ def destroy(json):
         while(not (hor.angleFlag and vert.angleFlag)):
             # this blocks until the goToAngle commands are both done
             time.sleep(1)
-            print("hi")
+            print(hor.angleFlag,vert.angleFlag)
+            print(not (hor.angleFlag and vert.angleFlag))
         fire_laser()
 
 def test_motors():
