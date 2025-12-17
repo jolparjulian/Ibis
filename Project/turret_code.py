@@ -27,21 +27,21 @@ vert.start_process()
 hor.start_process()
 
 # Positional variables
-cyl_position = [172.4,np.radians(299.68),4] # r t z
+cyl_position = [167.64,np.radians(99),4] # r t z
 position = [0,0,0] # disregard
 ref_positions = [] # place r/t/z/stepper angles into here to math later
 angle = [0,0] #pitch/yaw
 # replace the second number with our degrees position
-offset = 360-301 # so we can reference yaw angle to center
+offset = 360-99 # so we can reference yaw angle to center
 
 json_data = [] # to put json in later
 
 ip_string = "192.168.1.254" # defaults to his 
-ip_string = "172.20.10.4" # mine
+#ip_string = "172.20.10.4" # mine
 
 # some random stuff
 pos_tol = 3 * np.pi/180 # angular tolerance between us and the next turret over
-assumed_height = 25 # turret height for everyone else
+assumed_height = 4 # turret height for everyone else
 us_turret_num = 1 # our turret number, to find our position and also remove from json
 jog_amount = 0.4 #degrees to jog each arrow click
 # one step is ~0.35 degrees, 0.4 should stop itself after one step
@@ -616,7 +616,7 @@ def destroy(json):
         print(hor.angleFlag, vert.angleFlag)
         aim_at(target[0], target[1], target[2])
         print(f"shooting at {target}")
-        time.sleep(5)
+        time.sleep(8)
         '''
         while(not (hor.angleFlag and vert.angleFlag)):
             # this blocks until the goToAngle commands are both done
