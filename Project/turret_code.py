@@ -27,7 +27,7 @@ vert.start_process()
 hor.start_process()
 
 # Positional variables
-cyl_position = [182.9,np.radians(301),38.5] # r t z
+cyl_position = [172.4,np.radians(299.68),8.23] # r t z
 position = [0,0,0] # disregard
 ref_positions = [] # place r/t/z/stepper angles into here to math later
 angle = [0,0] #pitch/yaw
@@ -615,7 +615,7 @@ def destroy(json):
     for target in targets:
         aim_at(target[0], target[1], target[2])
         print(f"shooting at {target}")
-        while(not (hor.at_target and vert.at_target)):
+        while(not (hor.angleFlag and vert.angleFlag)):
             # this blocks until the goToAngle commands are both done
             pass
         fire_laser()
@@ -628,7 +628,7 @@ def test_motors():
     print(f"goToAngle to {test_angle}")
     vert.goToAngle(test_angle)
     hor.goToAngle(test_angle)
-    while(not (hor.at_target and vert.at_target)):
+    while(not (hor.angleFlag and vert.angleFlag)):
         # this blocks until the goToAngle commands are both done
         pass
     print("goToAngle done")
