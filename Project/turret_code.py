@@ -548,8 +548,8 @@ def system_zero(): # zeros the motors, run when pointing at origin
 
 def find_offset():
     global offset
-    angle = pos[1]
-    radius = pos[0]
+    angle = cyl_position[1]*180/np.pi
+    radius = cyl_position[0]
     if angle < 180:
         offset = -(180-angle)
     else:
