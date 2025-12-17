@@ -546,6 +546,16 @@ def system_zero(): # zeros the motors, run when pointing at origin
     hor.zero()
     print("zero")
 
+def find_offset():
+    global offset
+    angle = pos[1]
+    radius = pos[0]
+    if angle < 180:
+        offset = -(180-angle)
+    else:
+        angle = abs(360-angle)
+        offset = (180-angle)
+
 def aim_at(radius, angle, height):
     '''
     # this shit wasnt working so i went back to rect math
@@ -576,7 +586,7 @@ def aim_at(radius, angle, height):
     dy = y - y0
     dz = height - z0
     # triangle math
-    yaw = np.arctan2(dy,dx)*180/np.pi
+    yaw = np.arctan2(dy,dx)*180/np.pi - offset
     pitch = np.arctan2(dz,np.sqrt(dx**2 + dy**2))*180/np.pi
 
     # go motors go
@@ -686,4 +696,5 @@ def run_server():
 		print("Clean exit complete.")
 
 if __name__ == "__main__":
+    find_offset()
 	run_server()
