@@ -617,7 +617,7 @@ def destroy(json):
         aim_at(target[0], target[1], target[2])
         print(hor.angleFlag, vert.angleFlag)
         print(f"shooting at {target}")
-        while(not (hor.angleFlag and vert.angleFlag)):
+        while(not (hor.angleFlag.value and vert.angleFlag.value)):
             # this blocks until the goToAngle commands are both done
             pass
         fire_laser()
