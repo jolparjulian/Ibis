@@ -31,8 +31,11 @@ class Stepper:
                 with self.busy.get_lock():
                     self.busy.value = True
                 self.angleFlag = False
+                print("1")
                 self.__rotate(value)
+                print("2")
                 self.angleFlag = True
+                print("3")
                 with self.busy.get_lock():
                     self.busy.value = False
             elif cmd == "step":
@@ -61,7 +64,7 @@ class Stepper:
     # Signum function
     def __sgn(self, x):
         return 1 if x > 0 else -1 if x < 0 else 0
-        
+
     # Step motor by +1 or -1
     # CHANGED TO MAKE THE MOTORS GO BACKWARDS
     def __step(self, dir):
