@@ -41,7 +41,7 @@ ip_string = "172.20.10.4" # mine
 
 # some random stuff
 pos_tol = 3 * np.pi/180 # angular tolerance between us and the next turret over
-assumed_height = 31 # turret height for everyone else
+assumed_height = 25 # turret height for everyone else
 us_turret_num = 1 # our turret number, to find our position and also remove from json
 jog_amount = 0.4 #degrees to jog each arrow click
 # one step is ~0.35 degrees, 0.4 should stop itself after one step
@@ -528,7 +528,7 @@ def calibrate(): # run this after enough reference points
     x = P[0]
     y = P[1]
     cyl_position[1] = (np.arctan2(y,x) % (2*np.pi)).item() #radians, positive from 
-    cyl_position[2] = P[2].item()
+    #cyl_position[2] = P[2].item()
     print(cyl_position)
     return P
 
