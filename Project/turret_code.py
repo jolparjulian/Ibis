@@ -599,7 +599,7 @@ def destroy(json):
     # add targets from dicts
     for tid, turret in json.get("turrets",{}).items():
         r = turret["r"]
-        t = turret["theta"]
+        t = turret["theta"]*180/np.pi
         z = assumed_height
         '''
         if abs(t-cyl_position[1]) >= pos_tol: # make sure we dont try to kill ourselves
@@ -609,7 +609,7 @@ def destroy(json):
             targets.append([r, t, z]) # keeeeel
     for globe in json.get("globes",[]):
         r = globe["r"]
-        t = globe["theta"]
+        t = globe["theta"]*180/np.pi
         z = globe["z"]
         targets.append([r, t, z])
     for target in targets:
