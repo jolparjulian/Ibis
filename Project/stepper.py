@@ -31,12 +31,12 @@ class Stepper:
                 with self.busy.get_lock():
                     self.busy.value = True
                 self.angleFlag = False
-                print("1")
-                print(self.angleFlag)
+                #print("1")
+                #print(self.angleFlag)
                 self.__rotate(value)
-                print("2")
+                #print("2")
                 self.angleFlag = True
-                print(str(self.shifter_bit_start), self.angleFlag)
+                #print(str(self.shifter_bit_start), self.angleFlag)
                 with self.busy.get_lock():
                     self.busy.value = False
             elif cmd == "step":

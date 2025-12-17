@@ -616,11 +616,13 @@ def destroy(json):
         print(hor.angleFlag, vert.angleFlag)
         aim_at(target[0], target[1], target[2])
         print(f"shooting at {target}")
+        time.sleep(5)
+        '''
         while(not (hor.angleFlag and vert.angleFlag)):
             # this blocks until the goToAngle commands are both done
             time.sleep(1)
             print(hor.angleFlag,vert.angleFlag)
-            print(not (hor.angleFlag and vert.angleFlag))
+        '''
         fire_laser()
 
 def test_motors():
